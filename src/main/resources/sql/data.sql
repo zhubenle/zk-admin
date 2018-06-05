@@ -1,0 +1,1 @@
+insert into USER(NAME,AGE) values ('test', 12);
