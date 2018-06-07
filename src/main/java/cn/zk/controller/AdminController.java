@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author zhubenle
  */
 @Controller
-public class UserController {
+public class AdminController {
 
     private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserRepository userRepository) {
+    public AdminController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

@@ -19,3 +19,12 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  mvc:
+    static-path-pattern: /static/**
+  resources:
+    static-locations: classpath:/static/
+    chain:
+      strategy:
+        content:
+          enabled: true
+          paths: /static/**

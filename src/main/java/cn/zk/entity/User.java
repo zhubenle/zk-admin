@@ -22,7 +22,7 @@ public class User {
     @Column(name = "name", nullable = true, length = 20)
     private String name;
 
-    @Column(name = "age", nullable = true, length = 4)
+    @Column(name = "age", nullable = true, length = 3)
     private int age;
 
     public Integer getId() {

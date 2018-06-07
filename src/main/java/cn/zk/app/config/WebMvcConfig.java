@@ -1,6 +1,6 @@
-package cn.consult.admin.app.config;
+package cn.zk.app.config;
 
-import cn.consult.admin.app.intercepter.PageIntercepter;
+import cn.zk.app.intercepter.SessionIntercepter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.resource.GzipResourceResolver;
-import org.springframework.web.servlet.resource.VersionResourceResolver;
-import org.springframework.web.servlet.resource.WebJarsResourceResolver;
 
 import java.util.List;
 
@@ -28,33 +24,17 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WebMvcConfig.class);
 
-    private final PageIntercepter pageIntercepter;
+    private final SessionIntercepter sessionIntercepter;
 
     @Autowired
-    public WebMvcConfig(PageIntercepter pageIntercepter) {
-        this.pageIntercepter = pageIntercepter;
+    public WebMvcConfig(SessionIntercepter sessionIntercepter) {
+        this.sessionIntercepter = sessionIntercepter;
     }
 
     @Override
     protected void addViewControllers(ViewControllerRegistry registry) {
         super.addViewControllers(registry);
         registry.addRedirectViewController("/", "index");
-    }
-
-    @Override
-    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        super.addResourceHandlers(registry);
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
-                .setCachePeriod(60 * 60 * 24 * 365)
-                .resourceChain(false)
-                .addResolver(new GzipResourceResolver())
-                .addResolver(new VersionResourceResolver().addContentVersionStrategy("/**"));
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/")
-                .setCachePeriod(60 * 60 * 24 * 365)
-                .resourceChain(false)
-                .addResolver(new WebJarsResourceResolver());
     }
 
     @Override
@@ -66,11 +46,9 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         });
     }
 
-
-
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         super.addInterceptors(registry);
-        registry.addInterceptor(pageIntercepter).addPathPatterns("/*s");
+        registry.addInterceptor(sessionIntercepter).addPathPatterns("/**");
     }
 }
