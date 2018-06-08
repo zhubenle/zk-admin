@@ -19,6 +19,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    open-in-view: true
   mvc:
     static-path-pattern: /static/**
   resources:
@@ -28,3 +29,9 @@ spring:
         content:
           enabled: true
           paths: /static/**
+  thymeleaf:
+    enabled: true
+    encoding: UTF-8
+    mode: HTML
+    suffix: .html
+    cache: false

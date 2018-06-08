@@ -1,10 +1,11 @@
 package cn.zk.entity;
 
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.Objects;
 
 /**
  * <br/>
@@ -12,6 +13,7 @@ import java.util.Objects;
  *
  * @author zhubenle
  */
+@Data
 @Entity
 public class User {
 
@@ -19,62 +21,13 @@ public class User {
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "name", nullable = true, length = 20)
-    private String name;
+    @Column(name = "username", nullable = false, length = 50)
+    private String username;
 
-    @Column(name = "age", nullable = true, length = 3)
-    private int age;
+    @Column(name = "password", nullable = false, length = 64)
+    private String password;
 
-    public Integer getId() {
-        return id;
-    }
+    @Column(name = "del", nullable = false, length = 2)
+    private Byte del;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        User user = (User) o;
-        return age == user.age &&
-                Objects.equals(id, user.id) &&
-                Objects.equals(name, user.name);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(id, name, age);
-    }
 }

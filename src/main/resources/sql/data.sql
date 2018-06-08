@@ -1,1 +1,1 @@
-insert into USER(NAME,AGE) values ('test', 12);
+insert into `user` (`username`, `password`, `del`) values ('admin','admin', 0);

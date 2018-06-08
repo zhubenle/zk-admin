@@ -1,10 +1,12 @@
 package cn.zk.app.intercepter;
 
+import cn.zk.entity.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
 
 /**
  * 会话拦截器<br/>
@@ -13,11 +15,17 @@ import javax.servlet.http.HttpServletResponse;
  * @author zhubenle
  */
 @Component
-public class SessionIntercepter extends HandlerInterceptorAdapter {
+public class UserSessionIntercepter extends HandlerInterceptorAdapter {
+
+    public final static String SESSION_USER = "session_user";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
+        User user = (User) request.getSession().getAttribute(SESSION_USER);
+        if (Objects.isNull(user)) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return false;
+        }
         return true;
     }
 }

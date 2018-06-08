@@ -23,6 +23,6 @@ public class UserRepositoryTest {
 
     @Test
     public void testGet() {
-        System.out.println(userRepository.findAll());;
+        userRepository.findAll().forEach(System.out::println);
     }
 }
