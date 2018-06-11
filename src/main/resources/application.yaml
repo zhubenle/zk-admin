@@ -4,7 +4,7 @@ server:
     context-path: /zk-admin
 spring:
   datasource:
-    url: jdbc:h2:mem:zk-admin;MODE=MYSQL
+    url: jdbc:h2:file:~/.h2/zk_admin;MODE=MYSQL
     driver-class-name: org.h2.Driver
     username: root
     password: root
@@ -20,18 +20,12 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: true
-  mvc:
-    static-path-pattern: /static/**
-  resources:
-    static-locations: classpath:/static/
-    chain:
-      strategy:
-        content:
-          enabled: true
-          paths: /static/**
   thymeleaf:
     enabled: true
     encoding: UTF-8
     mode: HTML
     suffix: .html
     cache: false
+  messages:
+    basename: messages
+    encoding: UTF-8

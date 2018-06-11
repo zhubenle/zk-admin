@@ -8,8 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.resource.GzipResourceResolver;
+import org.springframework.web.servlet.resource.VersionResourceResolver;
+import org.springframework.web.servlet.resource.WebJarsResourceResolver;
 
 import java.util.List;
 
@@ -33,6 +37,22 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     }
 
     @Override
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        super.addResourceHandlers(registry);
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/")
+                .setCachePeriod(60 * 60 * 24 * 365)
+                .resourceChain(false)
+                .addResolver(new GzipResourceResolver())
+                .addResolver(new VersionResourceResolver().addContentVersionStrategy("/**"));
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/")
+                .setCachePeriod(60 * 60 * 24 * 365)
+                .resourceChain(false)
+                .addResolver(new WebJarsResourceResolver());
+    }
+
+    @Override
     protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         super.configureHandlerExceptionResolvers(exceptionResolvers);
         exceptionResolvers.add((request, response, handler, ex) -> {
@@ -44,6 +64,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         super.addInterceptors(registry);
-        registry.addInterceptor(sessionIntercepter).addPathPatterns("/**").excludePathPatterns("/login");
+        registry.addInterceptor(sessionIntercepter).addPathPatterns("/**")
+                .excludePathPatterns("/login").excludePathPatterns("/static/**", "/webjars/**", "sign_in");
     }
 }

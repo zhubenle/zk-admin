@@ -1,14 +1,20 @@
 package cn.zk.controller;
 
+import cn.zk.app.intercepter.UserSessionIntercepter;
 import cn.zk.entity.User;
-import cn.zk.repository.UserRepository;
+import cn.zk.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 /**
  * <br/>
@@ -21,16 +27,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class AdminController {
 
-    private final UserRepository userRepository;
+    private final AdminService adminService;
 
     @PostMapping(value = "/sign_in")
-    public String signIn(User user, ModelMap modelMap) {
-        modelMap.addAttribute("user", user);
-        return "login";
+    public String signIn(HttpSession httpSession, User user, RedirectAttributesModelMap modelMap) {
+        Optional<User> optionalUser = adminService.signIn(user);
+        if (optionalUser.isPresent()) {
+            User loginUser = optionalUser.get();
+            httpSession.setAttribute(UserSessionIntercepter.SESSION_USER, loginUser);
+            log.info("用户{}登录成功", loginUser.getEmail());
+            return "redirect:index";
+        }
+        modelMap.addFlashAttribute("loginFailMessage", "登录失败");
+        return "redirect:login";
     }
 
     @GetMapping(value = "/login")
-    public String toLogin(ModelMap modelMap) {
+    public String toLogin(HttpServletRequest request, @ModelAttribute("loginFailMessage") String loginFailMessage) {
+
         return "login";
     }
 

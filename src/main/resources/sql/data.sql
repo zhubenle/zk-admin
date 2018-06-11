@@ -1,1 +1,1 @@
-insert into `user` (`username`, `password`, `del`) values ('admin','admin', 0);
+insert into `user` (`email`, `password`, `del`) values ('zhubenle@foxmail.com', 'd033e22ae348aeb5660fc2140aec35850c4da997', 0);
