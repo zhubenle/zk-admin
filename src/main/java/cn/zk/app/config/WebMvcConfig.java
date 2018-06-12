@@ -65,6 +65,6 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     protected void addInterceptors(InterceptorRegistry registry) {
         super.addInterceptors(registry);
         registry.addInterceptor(sessionIntercepter).addPathPatterns("/**")
-                .excludePathPatterns("/login").excludePathPatterns("/static/**", "/webjars/**", "sign_in");
+                .excludePathPatterns("/login").excludePathPatterns("/static/**", "/webjars/**", "/sign_in", "/index");
     }
 }

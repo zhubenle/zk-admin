@@ -29,3 +29,10 @@ spring:
   messages:
     basename: messages
     encoding: UTF-8
+
+curator:
+  client:
+    base-sleep-time-ms: 6000
+    session-timeout-ms: 60000
+    connection-timeout-ms: 60000
+    max-retries: 5

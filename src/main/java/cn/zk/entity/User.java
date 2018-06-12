@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 /**
  * <br/>
@@ -26,6 +27,12 @@ public class User {
 
     @Column(name = "password", nullable = false, length = 64)
     private String password;
+
+    @Column(name = "create_time", nullable = false)
+    private LocalDateTime createTime;
+
+    @Column(name = "update_time", nullable = false)
+    private LocalDateTime updateTime;
 
     @Column(name = "del", nullable = false, length = 2)
     private Byte del;
