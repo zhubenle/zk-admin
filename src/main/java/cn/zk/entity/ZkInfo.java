@@ -10,23 +10,23 @@ import java.util.Date;
 
 /**
  * <br/>
- * Created on 2018/6/3 21:05.
+ * Created on 2018/6/12 14:44.
  *
  * @author zhubenle
  */
 @Data
 @Entity
-public class User {
+public class ZkInfo {
 
     @Id
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "email", nullable = false, length = 50)
-    private String email;
+    @Column(name = "alias", nullable = false, length = 100)
+    private String alias;
 
-    @Column(name = "password", nullable = false, length = 64)
-    private String password;
+    @Column(name = "hosts", nullable = false, length = 1024)
+    private String hosts;
 
     @Column(name = "create_time", nullable = false)
     private Date createTime;
@@ -36,5 +36,4 @@ public class User {
 
     @Column(name = "del", nullable = false, length = 2)
     private Byte del;
-
 }
