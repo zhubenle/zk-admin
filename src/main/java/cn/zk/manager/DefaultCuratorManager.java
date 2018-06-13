@@ -1,4 +1,4 @@
-package cn.zk.curator;
+package cn.zk.manager;
 
 import cn.zk.app.config.CuratorClientProperties;
 

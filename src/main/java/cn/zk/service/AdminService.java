@@ -26,20 +26,22 @@ public interface AdminService {
     /**
      * 分页获取用户列表
      *
-     * @param pageNo
+     * @param page
      *         页码
      * @param pageSize
      *         每页数量
      *
      * @return 分页对象
      */
-    Page<User> listUserByPage(Integer pageNo, Integer pageSize);
+    Page<User> listUserByPage(Integer page, Integer pageSize);
 
     /**
-     * 添加用户
+     * 添加获取按照主键更新用户
      *
      * @param user
      *         用户对象
+     *
+     * @return 添加或者更新后的对象
      */
-    void saveUser(User user);
+    User saveOrUpdateUser(User user);
 }

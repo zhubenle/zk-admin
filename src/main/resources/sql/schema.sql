@@ -1,4 +1,4 @@
-# drop table if exists `user`;
+-- drop table if exists `user`;
 
 create table if not exists `user` (
   `id` int(11) not null auto_increment comment '自增主键',
@@ -10,7 +10,7 @@ create table if not exists `user` (
   primary key (`id`)
 ) engine=innodb default charset=utf8;
 
-# drop table if exists `zk_info`;
+-- drop table if exists `zk_info`;
 create table if not exists `zk_info` (
   `id` int(11) not null auto_increment comment '自增主键',
   `alias` varchar(100) not null comment '别名',

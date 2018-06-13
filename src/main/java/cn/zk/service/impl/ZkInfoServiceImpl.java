@@ -1,16 +1,13 @@
 package cn.zk.service.impl;
 
-import cn.zk.constant.DelEnum;
 import cn.zk.entity.ZkInfo;
 import cn.zk.repository.ZkInfoRepository;
 import cn.zk.service.ZkInfoService;
-import cn.zk.util.DateUtils;
 import com.sun.tools.javac.util.Assert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,12 +28,8 @@ public class ZkInfoServiceImpl implements ZkInfoService {
     }
 
     @Override
-    public void saveZkInfo(ZkInfo zkInfo) {
+    public ZkInfo saveOrUpdateZkInfo(ZkInfo zkInfo) {
         Assert.checkNonNull(zkInfo, "保存ZkInfo时，zkInfo不能为空");
-        Date now = DateUtils.getCurrentDateTime();
-        zkInfo.setCreateTime(now);
-        zkInfo.setUpdateTime(now);
-        zkInfo.setDel(DelEnum.UN_DEL.getValue());
-        zkInfoRepository.save(zkInfo);
+        return zkInfoRepository.saveAndFlush(zkInfo);
     }
 }

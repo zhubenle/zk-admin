@@ -2,29 +2,102 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title th:text="#{index.head.title}">Title</title>
+    <link rel="icon" th:href="@{/static/image/favicon.ico}" />
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/static/admin.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/font-awesome.min.css}">
 </head>
 <body>
-<nav class="navbar navbar-fixed-top">
-    <div class="container">
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" th:href="@{/index}">zk-admin</a>
+            <button type="button" class="navbar-toggle show pull-left" data-target="sidebar">
+                <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html">zk-admin</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-expanded="false"><i class="fa fa-user fa-fw"></i>&nbsp;小王&nbsp;<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">用户管理</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">退出</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>
 </nav>
-
-<div class="container">
-    <hr>
+<div class="container-fluid all">
+    <div class="sidebar">
+        <ul class="nav">
+            <li><a th:href="@{/index}">主页面</a></li>
+        </ul>
+    </div>
+    <div class="maincontent row">
+        <ul class="breadcrumb">
+            <li class="active">首页</li>
+        </ul>
+        <div class="col-sm-12">
+            <div class="jumbotron">
+                <h1>这是一套开源的基于bootstrap的简易框架</h1>
+                <p>所用插件和库几乎都属于开源（个别特殊的会做说明），且功能正在不间断更新中</p>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item active">
+                    核心库（现在页面呈现效果必须依赖的库）
+                </li>
+                <li class="list-group-item">
+                    jquery-1.12.4.js（<a href="https://jquery.com/" target="_blank">官网</a>）
+                </li>
+                <li class="list-group-item">
+                    bootstrap3.3.6（<a href="https://getbootstrap.com/" target="_blank">官网</a>）
+                </li>
+                <li class="list-group-item">
+                    font-awesome4.6.3（<a href="http://fontawesome.io/" target="_blank">官网</a>）
+                </li>
+                <li class="list-group-item">
+                    <p>让页面返回顶部时平滑滚动（<a href="sample/scrolltop.html" target="_blank">样例</a>）</p>
+                    <p>使用说明：页面需要引用scrolltopcontrol.js</p>
+                </li>
+                <li class="list-group-item">
+                    <span class="badge">2016.4.28</span>
+                    <p>让bootstrap的carousel插件支持手势（<a href="sample/carousel.html" target="_blank">样例</a>）（<a href="https://github.com/hammerjs/jquery.hammer.js" target="_blank">jquery.hammer官网</a>）（<a href="http://hammerjs.github.io/" target="_blank">hammer.js官网</a>）</p>
+                    <p>
+                        使用说明：页面需要引用hammer.min.js、jquery.hammer.js
+                    </p>
+                    <p>注意：已将carousel的手势绑定事件封装到了default.js中，如果页面已经引用了default.js，就不用再给carousel写手势绑定事件了</p>
+                </li>
+                <li class="list-group-item">
+                    <span class="badge">2016.7.1</span>
+                    <p>页面加载进度条（<a href="sample/pace.html" target="_blank">样例</a>）（<a href="http://github.hubspot.com/pace/docs/welcome/" target="_blank">官网</a>）</p>
+                    <p>
+                        使用说明：1.页面需要引用pace.min.js、dataurl.css <br />
+                        2.官网提供多种样式供选择，只需要下载相应的css文件替换掉原来的css文件就行<br />
+                        3.dataurl.css里面可以调整进度条位置
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
-<script type="application/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
-<script type="application/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-<script type="application/javascript" th:src="@{/webjars/bootstrap-treeview/bootstrap-treeview.min.js}"></script>
+<a href="https://github.com/shihao316558512">
+    <img class="forkme" src="image/forkme.png" alt="Fork me on GitHub">
+</a>
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap-treeview/bootstrap-treeview.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/pace/pace.min.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/admin.js}"></script>
 </body>
 </html>

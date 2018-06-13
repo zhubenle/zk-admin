@@ -35,10 +35,18 @@ public class AdminController {
         if (optionalUser.isPresent()) {
             User loginUser = optionalUser.get();
             httpSession.setAttribute(UserSessionIntercepter.SESSION_USER, loginUser);
-            log.info("用户{}登录成功", loginUser.getEmail());
+            log.info("用户{} 登录成功", loginUser.getEmail());
             return "redirect:index";
         }
         modelMap.addFlashAttribute("loginFailMessage", "登录失败");
+        return "redirect:login";
+    }
+
+    @PostMapping(value = "/sign_out")
+    public String signOut(HttpSession httpSession) {
+        User user = (User) httpSession.getAttribute(UserSessionIntercepter.SESSION_USER);
+        httpSession.removeAttribute(UserSessionIntercepter.SESSION_USER);
+        log.info("用户{} 退出登录", user.getEmail());
         return "redirect:login";
     }
 
