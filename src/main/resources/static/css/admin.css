@@ -90,11 +90,11 @@ html, body {
 }
 
 .sidebar .sub-menu li[class*=active] > a {
-    color: #00acac !important;
+    color: #aba7b1 !important;
 }
 
 .maincontent {
-    width: 100%;
+    /*width: 100%;*/
     height: 100%;
     margin: 0 auto;
     min-width: 320px !important;
@@ -124,11 +124,11 @@ html, body {
 }
 
 .pace .pace-progress {
-    background: #66e1eb;
+    background: #337ab7;
     position: fixed;
     z-index: 2000;
     top: 46px;
     right: 100%;
     width: 100%;
-    height: 2px;
+    height: 5px;
 }

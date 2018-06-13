@@ -1,6 +1,7 @@
 package cn.zk.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * <br/>
@@ -8,8 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author zhubenle
  */
-@RestController
+@Controller
 public class ZkInfoController {
 
-
+    @GetMapping(value = "/zkinfos")
+    public String zkinfos() {
+        return "views/zkinfos";
+    }
 }

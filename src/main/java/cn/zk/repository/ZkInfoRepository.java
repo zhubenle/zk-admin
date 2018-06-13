@@ -10,5 +10,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author zhubenle
  */
 public interface ZkInfoRepository extends JpaRepository<ZkInfo, Integer> {
-
+    /**
+     * 根据别名删除ZkInfo
+     *
+     * @param alias
+     *         别名
+     */
+    void deleteZkInfoByAliasEquals(String alias);
 }

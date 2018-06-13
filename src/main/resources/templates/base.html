@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="common_head(title,links)">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:replace="${title}"></title>
+    <link rel="icon" th:href="@{/static/image/favicon.ico}"/>
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/font-awesome.min.css}">
+    <th:block th:replace="${links}" />
+</head>
+<body>
+<nav th:fragment="navbar" class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle show pull-left" data-target="sidebar">
+                <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/index}">zk-admin</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-expanded="false"><i class="fa fa-user fa-fw"></i><span th:text="${session.session_user.username}"></span><span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">退出</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div th:fragment="sidebar" class="sidebar">
+    <ul class="nav">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li th:if="${session.session_user.id} == 1"><a th:href="@{/users}">用户管理</a></li>
+        <li th:if="${session.session_user.id} == 1"><a th:href="@{/zkinfos}">zookeeper管理</a></li>
+    </ul>
+</div>
+<div th:fragment="script">
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap-treeview/bootstrap-treeview.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/pace/pace.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/admin.js}"></script>
+</div>
+</body>
+</html>

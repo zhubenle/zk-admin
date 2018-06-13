@@ -31,16 +31,16 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Optional<User> signIn(User user) {
-        if (Objects.isNull(user) || StringUtils.isEmpty(user.getEmail()) || StringUtils.isEmpty(user.getPassword())) {
+        if (Objects.isNull(user) || StringUtils.isEmpty(user.getUsername()) || StringUtils.isEmpty(user.getPassword())) {
             return Optional.empty();
         }
-        User result = userRepository.findByEmailEquals(user.getEmail());
+        User result = userRepository.findByUsernameEquals(user.getUsername());
         if (Objects.isNull(result)) {
-            log.warn("{}登录失败, 用户不存在", user.getEmail());
+            log.warn("{}登录失败, 用户不存在", user.getUsername());
             return Optional.empty();
         }
         if (!DigestUtils.sha1Hex(user.getPassword()).equals(result.getPassword())) {
-            log.warn("{}登录失败, 密码错误", user.getEmail());
+            log.warn("{}登录失败, 密码错误", user.getUsername());
             return Optional.empty();
         }
         return Optional.of(result);
@@ -48,6 +48,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Page<User> listUserByPage(Integer page, Integer pageSize) {
+        if (pageSize > 20) {
+            pageSize = 20;
+        }
         return userRepository.findAll(PageRequest.of(page - 1, pageSize));
     }
 

@@ -21,6 +21,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      *
      * @return 用户对象
      */
-    User findByEmailEquals(String username);
+    User findByUsernameEquals(String username);
 
 }

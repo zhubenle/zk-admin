@@ -53,3 +53,8 @@ var pageInitModule = (function (mod) {
     };
     return mod;
 })(window.pageInitModule || {});
+
+//退出
+$("#a_sign_out").on("click", function () {
+    $("#form_sign_out").submit();
+});

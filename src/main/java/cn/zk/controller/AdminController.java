@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,7 @@ public class AdminController {
         if (optionalUser.isPresent()) {
             User loginUser = optionalUser.get();
             httpSession.setAttribute(UserSessionIntercepter.SESSION_USER, loginUser);
-            log.info("用户{} 登录成功", loginUser.getEmail());
+            log.info("用户{} 登录成功", loginUser.getUsername());
             return "redirect:index";
         }
         modelMap.addFlashAttribute("loginFailMessage", "登录失败");
@@ -46,18 +47,23 @@ public class AdminController {
     public String signOut(HttpSession httpSession) {
         User user = (User) httpSession.getAttribute(UserSessionIntercepter.SESSION_USER);
         httpSession.removeAttribute(UserSessionIntercepter.SESSION_USER);
-        log.info("用户{} 退出登录", user.getEmail());
+        log.info("用户{} 退出登录", user.getUsername());
         return "redirect:login";
     }
 
     @GetMapping(value = "/login")
     public String toLogin(HttpServletRequest request, @ModelAttribute("loginFailMessage") String loginFailMessage) {
-
         return "login";
     }
 
     @GetMapping(value = "/index")
     public String index() {
-        return "index";
+        return "views/index";
+    }
+
+    @GetMapping(value = "/users")
+    public String users(Integer page, Integer pageSize, ModelMap modelMap) {
+//        modelMap.addAttribute("users", adminService.listUserByPage(page, pageSize));
+        return "views/users";
     }
 }

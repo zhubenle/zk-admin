@@ -20,12 +20,20 @@ public interface ZkInfoService {
     List<ZkInfo> listAll();
 
     /**
-     * 添加获取更新ZkInfo
+     * 添加ZkInfo
      *
      * @param zkInfo
      *         zk配置对象
      *
-     * @return 添加或者更新后的对象
      */
-    ZkInfo saveOrUpdateZkInfo(ZkInfo zkInfo);
+    void saveZkInfo(ZkInfo zkInfo);
+
+
+    /**
+     * 删除zkInfo
+     *
+     * @param alias
+     *         别名
+     */
+    void deleteZkInfoByAlias(String alias);
 }

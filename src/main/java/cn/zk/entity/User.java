@@ -24,6 +24,9 @@ public class User {
     @GeneratedValue
     private Integer id;
 
+    @Column(name = "username", nullable = false, length = 20)
+    private String username;
+
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
