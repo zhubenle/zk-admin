@@ -2,6 +2,9 @@ server:
   port: 8080
   servlet:
     context-path: /zk-admin
+    session:
+      timeout: 1d
+
 spring:
   datasource:
     url: jdbc:h2:file:~/.h2/zk_admin;MODE=MYSQL
@@ -19,7 +22,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-    open-in-view: true
   thymeleaf:
     enabled: true
     encoding: UTF-8
@@ -36,3 +38,9 @@ curator:
     session-timeout-ms: 60000
     connection-timeout-ms: 60000
     max-retries: 5
+logging:
+  file:
+    max-history: 30
+    max-size: 100MB
+  path: ../
+  level: info

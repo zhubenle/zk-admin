@@ -6,16 +6,45 @@
 <body>
 <div th:replace="~{base::navbar}"></div>
 <div class="container-fluid all">
-    <div th:replace="~{base::sidebar}"></div>
+    <div class="sidebar">
+        <ul class="nav" th:include="base::sidebar(~{::li})">
+        </ul>
+    </div>
     <div class="maincontent row">
         <ul class="breadcrumb">
             <li class="active" th:text="#{users.head.title}"></li>
         </ul>
         <div class="col-sm-12">
             <div class="jumbotron">
-                <h1>这是一套开源的基于bootstrap的简易框架</h1>
-                <p>所用插件和库几乎都属于开源（个别特殊的会做说明），且功能正在不间断更新中</p>
+                <button type="button" class="btn btn-primary">添加用户</button>
             </div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>邮箱</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user:${users.content}">
+                    <th th:text="${user.id}"></th>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.del}"></td>
+                    <td th:text="${user.createTime}"></td>
+                    <td th:text="${user.updateTime}"></td>
+                    <td>
+                        <button type="button" class="btn btn-primary btn-sm">编辑</button>&nbsp;&nbsp;
+                        <button type="button" class="btn btn-danger btn-sm">删除</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

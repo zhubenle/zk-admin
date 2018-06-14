@@ -4,7 +4,6 @@ import cn.zk.entity.User;
 import cn.zk.repository.UserRepository;
 import cn.zk.service.AdminService;
 import cn.zk.util.StringUtils;
-import com.sun.tools.javac.util.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -48,15 +48,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Page<User> listUserByPage(Integer page, Integer pageSize) {
-        if (pageSize > 20) {
-            pageSize = 20;
+        if (pageSize > 10) {
+            pageSize = 10;
         }
         return userRepository.findAll(PageRequest.of(page - 1, pageSize));
     }
 
     @Override
     public User saveOrUpdateUser(User user) {
-        Assert.checkNonNull(user, "添加或者更新User时，user不能为空");
+        Assert.notNull(user, "添加或者更新User时，user不能为空");
         return userRepository.saveAndFlush(user);
     }
 }

@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/static/css/admin.css}">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/font-awesome.min.css}">
-    <th:block th:replace="${links}" />
+    <th:block th:replace="${links}"/>
 </head>
 <body>
 <nav th:fragment="navbar" class="navbar navbar-inverse navbar-fixed-top">
@@ -30,20 +30,20 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                        aria-expanded="false"><i class="fa fa-user fa-fw"></i><span th:text="${session.session_user.username}"></span><span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">退出</a></li>
+                        <li><a id="a_sign_out" href="#">退出</a></li>
                     </ul>
                 </li>
             </ul>
+            <form id="form_sign_out" th:action="@{/sign_out}" method="post"></form>
         </div>
     </div>
 </nav>
-<div th:fragment="sidebar" class="sidebar">
-    <ul class="nav">
-        <li><a th:href="@{/index}">首页</a></li>
-        <li th:if="${session.session_user.id} == 1"><a th:href="@{/users}">用户管理</a></li>
-        <li th:if="${session.session_user.id} == 1"><a th:href="@{/zkinfos}">zookeeper管理</a></li>
-    </ul>
-</div>
+<ul th:fragment="sidebar(li)">
+    <li><a th:href="@{/index}">首页</a></li>
+    <li th:if="${session.session_user.id} == 1"><a th:href="@{/users}">用户管理</a></li>
+    <li th:if="${session.session_user.id} == 1"><a th:href="@{/zkinfos}">zookeeper管理</a></li>
+    <li th:each="zkinfo:${zkinfos}"><a th:href="@{/zkinfos/${zkinfo.alias}}" th:text="${zkinfo.alias}"></a></li>
+</ul>
 <div th:fragment="script">
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>

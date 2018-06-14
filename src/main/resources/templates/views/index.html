@@ -6,7 +6,10 @@
 <body>
 <div th:replace="~{base::navbar}"></div>
 <div class="container-fluid all">
-    <div th:replace="~{base::sidebar}"></div>
+    <div class="sidebar">
+        <ul class="nav" th:include="base::sidebar(~{::li})">
+        </ul>
+    </div>
     <div class="maincontent row">
         <ul class="breadcrumb">
             <li class="active">首页</li>

@@ -3,6 +3,7 @@ package cn.zk.controller;
 import cn.zk.app.intercepter.UserSessionIntercepter;
 import cn.zk.entity.User;
 import cn.zk.service.AdminService;
+import cn.zk.service.ZkInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ import java.util.Optional;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ZkInfoService zkInfoService;
 
     @PostMapping(value = "/sign_in")
     public String signIn(HttpSession httpSession, User user, RedirectAttributesModelMap modelMap) {
@@ -57,13 +60,16 @@ public class AdminController {
     }
 
     @GetMapping(value = "/index")
-    public String index() {
+    public String index(ModelMap modelMap) {
+        modelMap.addAttribute("zkinfos", zkInfoService.listAll());
         return "views/index";
     }
 
     @GetMapping(value = "/users")
-    public String users(Integer page, Integer pageSize, ModelMap modelMap) {
-//        modelMap.addAttribute("users", adminService.listUserByPage(page, pageSize));
+    public String users(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                        @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize, ModelMap modelMap) {
+        modelMap.addAttribute("users", adminService.listUserByPage(page, pageSize));
+        modelMap.addAttribute("zkinfos", zkInfoService.listAll());
         return "views/users";
     }
 }
