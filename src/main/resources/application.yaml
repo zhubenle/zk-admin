@@ -28,9 +28,9 @@ spring:
     mode: HTML
     suffix: .html
     cache: false
-  messages:
-    basename: messages
-    encoding: UTF-8
+  transaction:
+    default-timeout: 60s
+    rollback-on-commit-failure: true
 
 curator:
   client:
@@ -38,9 +38,3 @@ curator:
     session-timeout-ms: 60000
     connection-timeout-ms: 60000
     max-retries: 5
-logging:
-  file:
-    max-history: 30
-    max-size: 100MB
-  path: ../
-  level: info

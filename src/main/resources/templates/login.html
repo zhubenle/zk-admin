@@ -5,24 +5,50 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" th:href="@{/static/image/favicon.ico}" />
-    <title th:text="#{login.head.title}">Title</title>
+    <title>登录</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/toastr/toastr.css}">
     <link rel="stylesheet" th:href="@{/static/css/admin.css}">
 </head>
 <body>
 <div class="container">
     <form class="form-sign-in" th:action="@{/sign_in}" method="post">
-        <h2 th:text="#{login.h2.head}">Please sign in</h2>
+        <h2>请登录</h2>
         <div class="form-group">
-            <label for="input_username" class="sr-only" th:text="#{login.label.username}">Username</label>
-            <input type="text" id="input_username" class="form-control" name="username" value="admin" th:placeholder="#{login.label.username}">
+            <label for="input_username" class="sr-only">用户名</label>
+            <input type="text" id="input_username" class="form-control" name="username" value="admin" placeholder="用户名">
         </div>
         <div class="form-group">
-            <label for="input_password" class="sr-only" th:text="#{login.label.password}">Password</label>
-            <input type="password" id="input_password" class="form-control" name="password" th:placeholder="#{login.label.password}">
+            <label for="input_password" class="sr-only">密码</label>
+            <input type="password" id="input_password" class="form-control" name="password" placeholder="密码">
         </div>
-        <button class="btn btn-primary btn-block" type="submit" th:text="#{login.button}">Sign in</button>
+        <button class="btn btn-primary btn-block" type="submit">登录</button>
     </form>
 </div>
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/toastr/toastr.js}"></script>
+<script th:inline="javascript">
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+    var failMessage = /*[[${loginFailMessage}]]*/ "";
+    if (failMessage !== "") {
+        toastr["error"](failMessage);
+    }
+</script>
 </body>
 </html>

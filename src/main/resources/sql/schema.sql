@@ -6,7 +6,6 @@ create table if not exists `user` (
   `email` varchar(100) not null comment '邮箱地址',
   `create_time` datetime not null comment '创建时间',
   `update_time` datetime not null comment '更新时间',
-  `del` tinyint(2) not null default 0 comment '是否删除，1-是，0-否',
   primary key (`id`),
   UNIQUE KEY `username_uk`(`username`) USING BTREE
 ) engine=innodb default charset=utf8;

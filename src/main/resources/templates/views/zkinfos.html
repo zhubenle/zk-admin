@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="base::common_head(~{::title},~{})">
-    <title th:text="#{zkinfos.head.title}">Title</title>
+    <title>zookeeper管理</title>
 </head>
 <body>
 <div th:replace="~{base::navbar}"></div>
@@ -12,34 +12,36 @@
     </div>
     <div class="maincontent row">
         <ul class="breadcrumb">
-            <li class="active" th:text="#{zkinfos.head.title}"></li>
+            <li class="active">Zookeeper管理</li>
         </ul>
         <div class="col-sm-12">
             <div class="jumbotron">
                 <button type="button" class="btn btn-primary">添加用户</button>
             </div>
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>别名</th>
-                    <th>主机和端口</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="zkinfo:${zkinfos}">
-                    <td th:text="${zkinfo.id}"></td>
-                    <td th:text="${zkinfo.alias}"></td>
-                    <td th:text="${zkinfo.hosts}"></td>
-                    <td th:text="${zkinfo.createTime}"></td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm">删除</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>别名</th>
+                        <th>主机和端口</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="zkinfo:${zkinfos}">
+                        <td th:text="${zkinfo.id}"></td>
+                        <td th:text="${zkinfo.alias}"></td>
+                        <td th:text="${zkinfo.hosts}"></td>
+                        <td th:text="${zkinfo.createTime}"></td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm">删除</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

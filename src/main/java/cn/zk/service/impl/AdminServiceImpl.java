@@ -1,8 +1,11 @@
 package cn.zk.service.impl;
 
+import cn.zk.common.AdminException;
+import cn.zk.common.RespCode;
 import cn.zk.entity.User;
 import cn.zk.repository.UserRepository;
 import cn.zk.service.AdminService;
+import cn.zk.util.DateUtils;
 import cn.zk.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -54,9 +58,28 @@ public class AdminServiceImpl implements AdminService {
         return userRepository.findAll(PageRequest.of(page - 1, pageSize));
     }
 
+    @Transactional(rollbackOn = {Exception.class})
     @Override
-    public User saveOrUpdateUser(User user) {
+    public void saveOrUpdateUser(User user) {
         Assert.notNull(user, "添加或者更新User时，user不能为空");
-        return userRepository.saveAndFlush(user);
+        if (Objects.nonNull(user.getId())) {
+            user.setUpdateTime(DateUtils.getCurrentDateTime());
+            userRepository.updateUserById(user);
+            return;
+        }
+        userRepository.saveAndFlush(user);
+    }
+
+    @Override
+    public User getUserById(Integer userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new AdminException(RespCode.USER_NOT_FOUND));
+    }
+
+    @Override
+    public void deleteUserById(Integer userId) {
+        if (userId == 1) {
+            throw new AdminException(RespCode.CAN_NOT_DELETE);
+        }
+        userRepository.deleteById(userId);
     }
 }

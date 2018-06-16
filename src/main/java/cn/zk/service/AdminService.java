@@ -36,12 +36,26 @@ public interface AdminService {
     Page<User> listUserByPage(Integer page, Integer pageSize);
 
     /**
-     * 添加获取按照主键更新用户
+     * 添加或者更新用户
      *
      * @param user
      *         用户对象
-     *
-     * @return 添加或者更新后的对象
      */
-    User saveOrUpdateUser(User user);
+    void saveOrUpdateUser(User user);
+
+    /**
+     * 根据ID获取user
+     *
+     * @param userId
+     *         用户ID
+     *
+     * @return 用户
+     */
+    User getUserById(Integer userId);
+
+    /**
+     * 根据ID删除用户
+     * @param userId 用户ID
+     */
+    void deleteUserById(Integer userId);
 }

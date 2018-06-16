@@ -40,8 +40,4 @@ public class User {
     @LastModifiedDate
     @Column(name = "update_time", nullable = false)
     private Date updateTime;
-
-    @Column(name = "del", nullable = false, length = 2)
-    private Byte del;
-
 }
