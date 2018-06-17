@@ -46,7 +46,7 @@
         "hideMethod": "fadeOut"
     };
     var failMessage = /*[[${loginFailMessage}]]*/ "";
-    if (failMessage !== "") {
+    if (failMessage) {
         toastr["error"](failMessage);
     }
 </script>

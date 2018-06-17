@@ -1,6 +1,6 @@
 package cn.zk.common;
 
-import java.time.LocalDateTime;
+import cn.zk.util.DateUtils;
 
 /**
  * <br/>
@@ -12,26 +12,26 @@ public class Resp<T> {
 
     private Integer code;
     private String msg;
-    private LocalDateTime time;
+    private String time;
     private T data;
 
     public void success(T data) {
         this.code = RespCode.SUCCESS.getCode();
         this.msg = RespCode.SUCCESS.getMsg();
-        time = LocalDateTime.now();
+        time = DateUtils.getCurrentDateTimeStr();
         this.data = data;
     }
 
     public void fail(RespCode respCode) {
         this.code = respCode.getCode();
         this.msg = respCode.getMsg();
-        this.time = LocalDateTime.now();
+        this.time = DateUtils.getCurrentDateTimeStr();
     }
 
     public void fail(AdminException e) {
         this.code = e.getCode();
         this.msg = e.getMsg();
-        this.time = LocalDateTime.now();
+        this.time = DateUtils.getCurrentDateTimeStr();
     }
 
     public Integer getCode() {
@@ -50,11 +50,11 @@ public class Resp<T> {
         this.msg = msg;
     }
 
-    public LocalDateTime getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

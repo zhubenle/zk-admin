@@ -11,10 +11,12 @@ public enum RespCode {
      *
      */
     SUCCESS(10000, "成功"),
-    USER_NOT_FOUND(10001, "用户不存在"),
-    CAN_NOT_DELETE(10002, "admin用户不能删除"),
+    ERROR_10001(10001, "用户不存在"),
+    ERROR_10002(10002, "admin用户不能删除"),
+    ERROR_10003(10003, "别名不存在"),
+    ERROR_10004(10004, "参数错误"),
 
-    SYS_ERROR(99999, "系统异常")
+    ERROR_99999(99999, "系统异常")
     ;
 
     RespCode(Integer code, String msg) {

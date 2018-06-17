@@ -91,7 +91,7 @@ public class AdminController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("获取用户异常", e);
-            userResp.fail(RespCode.SYS_ERROR);
+            userResp.fail(RespCode.ERROR_99999);
         }
         return userResp;
     }
@@ -108,7 +108,7 @@ public class AdminController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("删除用户异常", e);
-            userResp.fail(RespCode.SYS_ERROR);
+            userResp.fail(RespCode.ERROR_99999);
         }
         return userResp;
     }

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="base::common_head(~{::title},~{})">
+    <title>zookeeper管理</title>
+</head>
+<body>
+<div th:replace="~{base::navbar}"></div>
+<div class="container-fluid all">
+    <div class="sidebar">
+        <ul class="nav" th:include="base::sidebar(~{::li})">
+        </ul>
+    </div>
+    <div class="maincontent row">
+        <ul class="breadcrumb">
+            <li class="active">zookeeper连接</li>
+        </ul>
+        <div class="col-sm-12">
+            <div class="table-responsive">
+                <div id="ztree" class="ztree"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{base::script}"></div>
+<script th:inline="javascript">
+    var failMessage = /*[[${zkInfoFailMessage}]]*/ "";
+    if (failMessage) {
+        toastr["error"](failMessage);
+    }
+    /*<![CDATA[*/
+    var contextPath = /*[[@{/}]]*/ '';
+    var alias = /*[[${zkinfo.alias}]]*/ '';
+    /*]]>*/
+    var setting = {
+        async: {
+            enable: true,
+            url: contextPath + "path/" + alias,
+            autoParam: ["id", "name=path"],
+            type: "get",
+            dataType: "json",
+            dataFilter: function (treeId, parentNode, responseData) {
+                if (10000 === responseData.code) {
+                    return responseData.data;
+                } else {
+                    toastr["error"](responseData.msg);
+                    return null;
+                }
+            }
+        }
+    };
+    $(document).ready(function(){
+        $.fn.zTree.init($("#ztree"), setting);
+    });
+</script>
+</body>
+</html>

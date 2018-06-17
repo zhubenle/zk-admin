@@ -89,7 +89,7 @@
 <div th:replace="~{base::script}"></div>
 <script th:inline="javascript">
     var failMessage = /*[[${userFailMessage}]]*/ "";
-    if (failMessage !== "") {
+    if (failMessage) {
         toastr["error"](failMessage);
     }
     var modalUseId = $("#modal_user_id");

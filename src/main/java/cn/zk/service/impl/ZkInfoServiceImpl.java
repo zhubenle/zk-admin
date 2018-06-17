@@ -1,18 +1,25 @@
 package cn.zk.service.impl;
 
 import cn.zk.app.config.CuratorClientProperties;
+import cn.zk.common.AdminException;
+import cn.zk.common.RespCode;
+import cn.zk.entity.PathVO;
 import cn.zk.entity.ZkInfo;
 import cn.zk.manager.DefaultCuratorManager;
 import cn.zk.manager.factory.CuratorManagerFactory;
 import cn.zk.repository.ZkInfoRepository;
 import cn.zk.service.ZkInfoService;
-import org.springframework.util.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.transaction.Transactional;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <br/>
@@ -36,16 +43,36 @@ public class ZkInfoServiceImpl implements ZkInfoService {
 
     @Override
     public void saveZkInfo(ZkInfo zkInfo) {
-        Assert.notNull(zkInfo, "保存ZkInfo，zkInfo不能为空");
         zkInfoRepository.save(zkInfo);
         curatorManagerFactory.getManagerMap().put(zkInfo.getAlias(), new DefaultCuratorManager(zkInfo.getHosts(), curatorClientProperties));
     }
 
+    @Transactional(rollbackOn = Exception.class)
     @Override
     public void deleteZkInfoByAlias(String alias) {
-        Assert.hasText(alias, "删除ZkInfo，alias不能为空");
+        if (StringUtils.isEmpty(alias)) {
+            throw new AdminException(RespCode.ERROR_10004);
+        }
         zkInfoRepository.deleteZkInfoByAliasEquals(alias);
         curatorManagerFactory.removeManager(alias);
         log.info("删除ZkInfo, alias={}", alias);
+    }
+
+    @Override
+    public List<PathVO> listZkChildrenPath(String alias, String pathName, String pathId) {
+        DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
+                .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
+        List<PathVO> result = curatorManager.listChildrenPath(StringUtils.isEmpty(pathId) ? File.separator : pathId)
+                .stream()
+                .map(s -> new PathVO(s, curatorManager.getPathStat(pathId + File.separator + s).getNumChildren() > 0)
+                        .withId(pathId + File.separator + s))
+                .collect(Collectors.toList());
+
+        if (StringUtils.isEmpty(pathId)) {
+            List<PathVO> temp = new ArrayList<>();
+            temp.add(new PathVO(File.separator, true).withOpen(true).withChildren(result).withId(pathId));
+            result = temp;
+        }
+        return result;
     }
 }

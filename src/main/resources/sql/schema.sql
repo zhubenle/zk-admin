@@ -13,8 +13,8 @@ create table if not exists `user` (
 drop table if exists `zk_info`;
 create table if not exists `zk_info` (
   `id` int(11) not null auto_increment comment '自增主键',
-  `alias` varchar(100) not null comment '别名',
-  `hosts` varchar(64) not null comment 'zk地址端口',
+  `alias` varchar(32) not null comment '别名',
+  `hosts` varchar(1024) not null comment 'zk地址端口',
   `create_time` datetime not null comment '创建时间',
   primary key (`id`),
   UNIQUE KEY `alias_uk`(`alias`) USING BTREE,

@@ -16,7 +16,7 @@
         </ul>
         <div class="col-sm-12">
             <div class="jumbotron">
-                <button type="button" class="btn btn-primary">添加用户</button>
+                <button type="button" class="btn btn-primary" id="btn_add_zk">添加zookeeper连接</button>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -36,7 +36,7 @@
                         <td th:text="${zkinfo.hosts}"></td>
                         <td th:text="${zkinfo.createTime}"></td>
                         <td>
-                            <button type="button" class="btn btn-danger btn-sm">删除</button>
+                            <button type="button" class="btn btn-danger btn-sm" th:value="${zkinfo.alias}" name="btn_delete">删除</button>
                         </td>
                     </tr>
                     </tbody>
@@ -45,6 +45,113 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="modal_zk" tabindex="-1" role="dialog" aria-labelledby="modalZk">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal_user_title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form_zkinfo" th:action="@{/zkinfo}" class="form-horizontal" method="post">
+                    <div class="form-group">
+                        <label for="modal_input_username" class="control-label  col-sm-4">别名</label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" name="alias" id="modal_input_username" maxlength="20"
+                                   autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_input_password" class="control-label  col-sm-4">zookeeper地址和端口</label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" name="hosts" id="modal_input_password"
+                                   placeholder="192.168.1.100:2181,192.168.1.101:2181"
+                                   autocomplete="new-password"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_zk_submit">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div th:replace="~{base::script}"></div>
+<script th:inline="javascript">
+    var failMessage = /*[[${zkInfosFailMessage}]]*/ "";
+    if (failMessage) {
+        toastr["error"](failMessage);
+    }
+    /*<![CDATA[*/
+    var contextPath = /*[[@{/}]]*/ '';
+    /*]]>*/
+
+    var formZk = $("#form_zkinfo");
+    var modalZk = $("#modal_zk");
+    var btnZkSubmit = $("#btn_zk_submit");
+    $("button[name='btn_delete']").on("click", function () {
+        var btn = $(this);
+        swal({
+            title: "你确定?",
+            text: "删除之后，该数据将无法再恢复!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    type: "DELETE",
+                    dataType: "json",
+                    url: contextPath + "/zkinfo/" + btn.val(),
+                    success: function (data) {
+                        if (10000 === data.code) {
+                            window.location.href = contextPath + "zkinfos";
+                        } else {
+                            toastr["error"](data.msg);
+                        }
+                    },
+                    error: function (textStatus, errorThrown) {
+                        toastr["error"](textStatus + " " + errorThrown.toString());
+                    },
+                    complete: function () {
+                    }
+                });
+            }
+        });
+    });
+
+    $("#btn_add_zk").on("click", function () {
+        modalZk.find("#modal_user_title").html("添加zookeeper配置");
+        modalZk.modal();
+    });
+
+    formZk.find("input").each(function () {
+        $(this).on("focus", function () {
+            $(this).parents(".form-group").removeClass("has-error");
+        });
+    });
+
+    modalZk.on("hidden.bs.modal", function () {
+        formZk.find("div .form-group").removeClass("has-error");
+        formZk.find("input").val("");
+    });
+
+    btnZkSubmit.on("click", function () {
+        var submit = true;
+        formZk.find("input[type!='hidden']").each(function () {
+            if ($(this).val().trim() === "") {
+                submit = false;
+                $(this).parents("div .form-group").addClass("has-error");
+            }
+        });
+        if (submit) {
+            modalZk.modal();
+            formZk.submit();
+        }
+    });
+</script>
 </body>
 </html>

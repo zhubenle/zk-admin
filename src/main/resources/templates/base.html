@@ -10,6 +10,7 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/font-awesome.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/toastr/toastr.css}">
+    <link rel="stylesheet" th:href="@{/webjars/zTree/css/zTreeStyle/zTreeStyle.css}">
     <th:block th:replace="${links}"/>
 </head>
 <body>
@@ -43,14 +44,14 @@
     <li><a th:href="@{/index}">首页</a></li>
     <li th:if="${session.session_user.id} == 1"><a th:href="@{/users}">用户管理</a></li>
     <li th:if="${session.session_user.id} == 1"><a th:href="@{/zkinfos}">zookeeper管理</a></li>
-    <li th:each="zkinfo:${zkinfos}"><a th:href="@{/zkinfos/{alias}(alias=${zkinfo.alias})}" th:text="${zkinfo.alias}"></a></li>
+    <li th:each="zkinfo:${zkinfos}"><a th:href="@{/zkinfo/{alias}(alias=${zkinfo.alias})}" th:text="${zkinfo.alias}"></a></li>
 </ul>
 <div th:fragment="script">
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-    <script type="text/javascript" th:src="@{/webjars/bootstrap-treeview/bootstrap-treeview.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/pace/pace.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/toastr/toastr.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/zTree/js/jquery.ztree.core.min.js}"></script>
     <script type="text/javascript" th:src="@{/static/js/sweetalert.min.js}"></script>
     <script type="text/javascript" th:src="@{/static/js/admin.js}"></script>
 </div>

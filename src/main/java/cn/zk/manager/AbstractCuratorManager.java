@@ -9,6 +9,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.ZooTrace;
 
 import java.util.List;
@@ -43,8 +44,6 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
 
     @Override
     public void stateChanged(CuratorFramework client, ConnectionState newState) {
-        String connectionString = client.getZookeeperClient().getCurrentConnectionString();
-        System.out.println("----" + connectionString);
         log.warn("连接状态改变, 最新连接状态: {}", newState);
     }
 
@@ -71,6 +70,11 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
      */
     @SneakyThrows
     public boolean checkPathExist(String path) {
-        return Objects.nonNull(client.checkExists().forPath(path));
+        return Objects.nonNull(getPathStat(path));
+    }
+
+    @SneakyThrows
+    public Stat getPathStat(String path) {
+        return client.checkExists().forPath(path);
     }
 }

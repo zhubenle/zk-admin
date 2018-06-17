@@ -25,8 +25,8 @@ public class CuratorManagerFactory {
      *
      * @return curator管理对象
      */
-    public AbstractCuratorManager getManager(String alias) {
-        return managerMap.get(alias);
+    public Optional<AbstractCuratorManager> getManager(String alias) {
+        return Optional.ofNullable(managerMap.get(alias));
     }
 
     public void setManagerMap(Map<String, AbstractCuratorManager> managerMap) {

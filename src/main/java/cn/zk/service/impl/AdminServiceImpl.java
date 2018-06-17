@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import javax.transaction.Transactional;
 import java.util.Objects;
@@ -61,7 +60,6 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(rollbackOn = {Exception.class})
     @Override
     public void saveOrUpdateUser(User user) {
-        Assert.notNull(user, "添加或者更新User时，user不能为空");
         if (Objects.nonNull(user.getId())) {
             user.setUpdateTime(DateUtils.getCurrentDateTime());
             userRepository.updateUserById(user);
@@ -72,13 +70,13 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public User getUserById(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new AdminException(RespCode.USER_NOT_FOUND));
+        return userRepository.findById(userId).orElseThrow(() -> new AdminException(RespCode.ERROR_10001));
     }
 
     @Override
     public void deleteUserById(Integer userId) {
         if (userId == 1) {
-            throw new AdminException(RespCode.CAN_NOT_DELETE);
+            throw new AdminException(RespCode.ERROR_10002);
         }
         userRepository.deleteById(userId);
     }

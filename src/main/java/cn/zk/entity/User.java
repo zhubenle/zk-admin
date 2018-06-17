@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -24,12 +25,15 @@ public class User {
     @GeneratedValue
     private Integer id;
 
+    @NotNull(message = "用户名不能为空")
     @Column(name = "username", nullable = false, length = 20)
     private String username;
 
+    @NotNull(message = "邮箱不能为空")
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
+    @NotNull(message = "密码不能为空")
     @Column(name = "password", nullable = false, length = 64)
     private String password;
 
