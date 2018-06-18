@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:fragment="common_head(title,links)">
+<head th:fragment="common_head(title,style)">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -11,7 +11,7 @@
     <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/font-awesome.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/toastr/toastr.css}">
     <link rel="stylesheet" th:href="@{/webjars/zTree/css/zTreeStyle/zTreeStyle.css}">
-    <th:block th:replace="${links}"/>
+    <style th:replace="${style}"></style>
 </head>
 <body>
 <nav th:fragment="navbar" class="navbar navbar-inverse navbar-fixed-top">

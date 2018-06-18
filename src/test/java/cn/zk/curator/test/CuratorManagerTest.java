@@ -22,8 +22,7 @@ public class CuratorManagerTest {
         clientProperties.setMaxRetries(3);
         clientProperties.setSessionTimeoutMs(60000);
         DefaultCuratorManager curatorManager = new DefaultCuratorManager("127.0.0.1:2181", clientProperties);
-        curatorManager.listChildrenPath("/zookeeper").forEach(System.out::println);
-        System.out.println(curatorManager.getPathStat("/"));
+        curatorManager.createPath("/search/manage/test", "a", null, 0);
     }
 
     @Test

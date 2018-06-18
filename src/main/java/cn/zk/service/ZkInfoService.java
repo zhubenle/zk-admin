@@ -1,5 +1,6 @@
 package cn.zk.service;
 
+import cn.zk.entity.PathDataVO;
 import cn.zk.entity.PathVO;
 import cn.zk.entity.ZkInfo;
 
@@ -42,12 +43,50 @@ public interface ZkInfoService {
      *
      * @param alias
      *         别名
-     * @param pathName
-     *         路径
      * @param pathId
      *         路径ID
      *
      * @return 子路径列表
      */
-    List<PathVO> listZkChildrenPath(String alias, String pathName, String pathId);
+    List<PathVO> listZkChildrenPath(String alias, String pathId);
+
+    /**
+     * 删除路径
+     *
+     * @param alias
+     *         别名
+     * @param pathId
+     *         路径ID
+     * @param dataVersion
+     *         路径数据版本
+     */
+    void deletePath(String alias, String pathId, Integer dataVersion);
+
+    /**
+     * 创建接节点
+     *
+     * @param alias
+     *         别名
+     * @param pathId
+     *         节点路径
+     * @param createMode
+     *         节点类型
+     * @param data
+     *         节点数据
+     *
+     * @return 节点路径
+     */
+    String createPath(String alias, String pathId, String data, Integer createMode);
+
+    /**
+     * 获取指定path的数据
+     *
+     * @param alias
+     *         别名
+     * @param pathId
+     *         路径
+     *
+     * @return 路径数据
+     */
+    PathDataVO getPathData(String alias, String pathId);
 }

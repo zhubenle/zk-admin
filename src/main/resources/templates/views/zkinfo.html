@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="base::common_head(~{::title},~{})">
+<head th:include="base::common_head(~{::title},~{::style})">
     <title>zookeeper管理</title>
+    <style>
+        .table > tbody > tr > td {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+    </style>
 </head>
 <body>
 <div th:replace="~{base::navbar}"></div>
@@ -15,8 +21,108 @@
             <li class="active">zookeeper连接</li>
         </ul>
         <div class="col-sm-12">
-            <div class="table-responsive">
-                <div id="ztree" class="ztree"></div>
+            <div class="row">
+                <div class="col-md-4">
+                    <button class="btn btn-primary" id="btn_add">添加</button> &nbsp;
+                    <button class="btn btn-primary" id="btn_edit">修改</button> &nbsp;
+                    <button class="btn btn-info" id="btn_refresh">刷新</button> &nbsp;
+                    <button class="btn btn-danger" id="btn_delete">删除</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div id="ztree" class="ztree"></div>
+                </div>
+                <div class="col-md-8">
+                    <table class="table table-striped">
+                        <tbody>
+                        <tr>
+                            <td width="20px">cZxid</td>
+                            <td id="cZxid"></td>
+                        </tr>
+                        <tr>
+                            <td>ctime</td>
+                            <td id="ctime"></td>
+                        </tr>
+                        <tr>
+                            <td>mZxid</td>
+                            <td id="mZxid"></td>
+                        </tr>
+                        <tr>
+                            <td>mtime</td>
+                            <td id="mtime"></td>
+                        </tr>
+                        <tr>
+                            <td>pZxid</td>
+                            <td id="pZxid"></td>
+                        </tr>
+                        <tr>
+                            <td>cversion</td>
+                            <td id="cversion"></td>
+                        </tr>
+                        <tr>
+                            <td>dataVersion</td>
+                            <td id="dataVersion"></td>
+                        </tr>
+                        <tr>
+                            <td>aclVersion</td>
+                            <td id="aclVersion"></td>
+                        </tr>
+                        <tr>
+                            <td>ephemeralOwner</td>
+                            <td id="ephemeralOwner"></td>
+                        </tr>
+                        <tr>
+                            <td>dataLength</td>
+                            <td id="dataLength"></td>
+                        </tr>
+                        <tr>
+                            <td>numChildren</td>
+                            <td id="numChildren"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><code id="path_data"></code></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="modal_path" tabindex="-1" role="dialog" aria-labelledby="modalPath">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal_path_title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form_path" class="form-horizontal">
+                    <div class="form-group">
+                        <label for="modal_input_pathName" class="control-label col-sm-4">节点名称</label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" id="modal_input_pathName" maxlength="20" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_input_data" class="control-label col-sm-4">数据</label>
+                        <div class="col-sm-7">
+                            <textarea class="form-control" id="modal_input_data" autocomplete="new-password"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_input_createMode" class="control-label col-sm-4">节点类型</label>
+                        <div class="col-sm-7">
+                            <textarea class="form-control" id="modal_input_createMode" autocomplete="new-password"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_path_submit">提交</button>
             </div>
         </div>
     </div>
@@ -32,24 +138,188 @@
     var alias = /*[[${zkinfo.alias}]]*/ '';
     /*]]>*/
     var setting = {
+        view: {
+            selectedMulti: false
+        },
         async: {
             enable: true,
             url: contextPath + "path/" + alias,
             autoParam: ["id", "name=path"],
-            type: "get",
+            type: "GET",
             dataType: "json",
             dataFilter: function (treeId, parentNode, responseData) {
                 if (10000 === responseData.code) {
                     return responseData.data;
                 } else {
-                    toastr["error"](responseData.msg);
+                    swal("获取子节点失败", responseData.msg, "error");
                     return null;
+                }
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, treeNode, clickFlag) {
+                if (clickFlag === 1) {
+                    //选中
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url: contextPath + "/path/data/" + alias + "?pathId=" + treeNode.id,
+                        success: function (data) {
+                            if (10000 === data.code) {
+                                if (data.data) {
+                                    $("#cZxid").html(data.data.czxId);
+                                    $("#ctime").html(data.data.cTimeStr + "  毫秒[" + data.data.cTime + "]");
+                                    $("#mZxid").html(data.data.mzxId);
+                                    $("#mtime").html(data.data.mTimeStr + "  毫秒[" + data.data.mTime + "]");
+                                    $("#pZxid").html(data.data.pzxId);
+                                    $("#cversion").html(data.data.cVersion);
+                                    $("#dataVersion").html(data.data.version);
+                                    $("#aclVersion").html(data.data.aVersion);
+                                    $("#ephemeralOwner").html(data.data.ephemeralOwner);
+                                    $("#dataLength").html(data.data.dataLength);
+                                    $("#numChildren").html(data.data.numChildren);
+                                    $("#path_data").html(data.data.data);
+                                } else {
+                                    cleanTable();
+                                }
+                            } else {
+                                cleanTable();
+                                swal("获取节点数据失败", data.msg, "error");
+                            }
+                        },
+                        error: function (textStatus, errorThrown) {
+                            cleanTable();
+                            swal("获取节点数据失败", textStatus + " " + errorThrown.toString(), "error");
+                        }
+                    });
                 }
             }
         }
     };
-    $(document).ready(function(){
+    $(document).ready(function () {
         $.fn.zTree.init($("#ztree"), setting);
+    });
+
+    function cleanTable() {
+        $("#cZxid").html("");
+        $("#ctime").html("");
+        $("#mZxid").html("");
+        $("#mtime").html("");
+        $("#pZxid").html("");
+        $("#cversion").html("");
+        $("#dataVersion").html("");
+        $("#aclVersion").html("");
+        $("#ephemeralOwner").html("");
+        $("#dataLength").html("");
+        $("#numChildren").html("");
+        $("#path_data").html("");
+    }
+
+    $("#btn_refresh").on("click", function () {
+        var zTree = $.fn.zTree.getZTreeObj("ztree");
+        var nodes = zTree.getSelectedNodes();
+        if (nodes.length === 0) {
+            swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
+            return;
+        }
+        zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+    });
+
+    $("#btn_delete").on("click", function () {
+        var zTree = $.fn.zTree.getZTreeObj("ztree");
+        var nodes = zTree.getSelectedNodes();
+        if (nodes.length === 0) {
+            swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
+            return;
+        }
+        swal({
+            title: "你正在执行删除操作",
+            text: "删除之后，该数据将无法再恢复!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    type: "DELETE",
+                    dataType: "json",
+                    url: contextPath + "/path/" + alias + "?dataVersion=" + $("#dataVersion").html() + "&pathId=" + nodes[0].id,
+                    success: function (data) {
+                        if (10000 === data.code) {
+                            zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                            swal("删除成功", "节点" + nodes[0].id + "删除成功", "success");
+                        } else {
+                            swal("删除节点失败", data.msg, "error");
+                        }
+                    },
+                    error: function (textStatus, errorThrown) {
+                        swal("删除节点失败", textStatus + " " + errorThrown.toString(), "error");
+                    }
+                });
+            }
+        });
+    });
+
+    var modalPath = $("#modal_path");
+    var modalPathName = $("#modal_input_pathName");
+    var modalData = $("#modal_input_data");
+    var modalCreateMode = $("#modal_input_createMode");
+
+    modalPath.on("hidden.bs.modal", function () {
+        modalPath.find("div .form-group").removeClass("has-error");
+        modalPath.find("input").val("");
+    });
+
+    $("#btn_edit").on("click", function () {
+        var zTree = $.fn.zTree.getZTreeObj("ztree");
+        var nodes = zTree.getSelectedNodes();
+        if (nodes.length === 0) {
+            swal("选择一个节点", "你必须选择一个节点, 再编辑", "error");
+            return;
+        }
+        modalPath.find("#modal_path_title").html("编辑节点");
+        modalPath.modal();
+    });
+
+    $("#btn_add").on("click", function () {
+        var zTree = $.fn.zTree.getZTreeObj("ztree");
+        var nodes = zTree.getSelectedNodes();
+        if (nodes.length === 0) {
+            swal("选择一个节点", "你必须选择一个节点添加子节点, 再添加", "error");
+            return;
+        }
+        modalPath.find("#modal_path_title").html("添加节点");
+        modalPath.modal();
+    });
+
+    $("#btn_path_submit").on("click", function () {
+        var submit = true;
+        modalPath.find("input[type!='hidden']").each(function () {
+            if ($(this).val().trim() === "") {
+                submit = false;
+                $(this).parents("div .form-group").addClass("has-error");
+            }
+        });
+        if (submit) {
+            var zTree = $.fn.zTree.getZTreeObj("ztree");
+            var nodes = zTree.getSelectedNodes();
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: contextPath + "/path/" + alias + "?createMode=" + modalCreateMode + "&data=" + modalData + "&pathId=" + nodes[0].id + "/" + modalPathName,
+                success: function (data) {
+                    if (10000 === data.code) {
+                        zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+                        swal("添加成功", "节点" + data.data + "添加成功", "success");
+                    } else {
+                        swal("添加节点失败", data.msg, "error");
+                    }
+                },
+                error: function (textStatus, errorThrown) {
+                    swal("添加节点失败", textStatus + " " + errorThrown.toString(), "error");
+                }
+            });
+        }
     });
 </script>
 </body>

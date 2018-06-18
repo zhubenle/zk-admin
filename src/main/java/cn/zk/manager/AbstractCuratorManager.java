@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.CreateBackgroundModeStatACLable;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.ZooTrace;
 
@@ -23,6 +26,8 @@ import java.util.Objects;
  */
 @Slf4j
 public abstract class AbstractCuratorManager implements ConnectionStateListener {
+
+    protected final static String DEFAULT_CHARSET = "UTF-8";
 
     protected final CuratorFramework client;
 
@@ -60,6 +65,23 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
         return client.getChildren().forPath(parentPath);
     }
 
+    @SneakyThrows
+    public void deletePath(String path, Integer version) {
+        client.delete().guaranteed().deletingChildrenIfNeeded().withVersion(version).forPath(path);
+    }
+
+    @SneakyThrows
+    public String createPath(String path, String data, List<ACL> acls, int createMode) {
+        CreateBackgroundModeStatACLable createBackgroundModeStatACLable = client.create().compressed();
+        if (Objects.nonNull(acls)) {
+            createBackgroundModeStatACLable.withACL(acls);
+        }
+        if (Objects.nonNull(createMode)) {
+            createBackgroundModeStatACLable.withMode(CreateMode.fromFlag(createMode));
+        }
+        return createBackgroundModeStatACLable.forPath(path, data.getBytes(DEFAULT_CHARSET));
+    }
+
     /**
      * 检查指定路径是否存在
      *
@@ -76,5 +98,10 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
     @SneakyThrows
     public Stat getPathStat(String path) {
         return client.checkExists().forPath(path);
+    }
+
+    @SneakyThrows
+    public String getPathData(String path, Stat stat) {
+        return new String(client.getData().storingStatIn(stat).forPath(path), DEFAULT_CHARSET);
     }
 }

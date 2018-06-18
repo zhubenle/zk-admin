@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -14,8 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.resource.GzipResourceResolver;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
 import org.springframework.web.servlet.resource.WebJarsResourceResolver;
-
-import java.util.List;
 
 /**
  * <br/>
@@ -50,15 +46,6 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .setCachePeriod(60 * 60 * 24 * 365)
                 .resourceChain(false)
                 .addResolver(new WebJarsResourceResolver());
-    }
-
-    @Override
-    protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-        super.configureHandlerExceptionResolvers(exceptionResolvers);
-        exceptionResolvers.add((request, response, handler, ex) -> {
-            log.warn("全局异常处理, 异常信息: ", ex);
-            return new ModelAndView("error/500");
-        });
     }
 
     @Override

@@ -3,9 +3,11 @@ package cn.zk.controller;
 import cn.zk.common.AdminException;
 import cn.zk.common.Resp;
 import cn.zk.common.RespCode;
+import cn.zk.entity.PathDataVO;
 import cn.zk.entity.PathVO;
 import cn.zk.entity.ZkInfo;
 import cn.zk.service.ZkInfoService;
+import cn.zk.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,18 +95,70 @@ public class ZkInfoController {
     @GetMapping(value = "/path/{alias}")
     @ResponseBody
     public Resp<List<PathVO>> getPath(@PathVariable(value = "alias") String alias,
-                                      @RequestParam(value = "name", required = false, defaultValue = "/") String name,
-                                      @RequestParam(value = "id", required = false, defaultValue = "") String id,
-                                      ModelMap modelMap) {
+                                      @RequestParam(value = "id", required = false, defaultValue = "") String id) {
         Resp<List<PathVO>> userResp = new Resp<>();
         try {
-
-            userResp.success(zkInfoService.listZkChildrenPath(alias, name, id));
+            userResp.success(zkInfoService.listZkChildrenPath(alias, id));
         } catch (AdminException e) {
-            log.error("获取alias={}, path={}失败: {}", alias, id, e.getCodeMsg());
+            log.error("获取alias={}, path={}子路径失败: {}", alias, id, e.getCodeMsg());
             userResp.fail(e);
         } catch (Exception e) {
-            log.error("获取alias={}, path={}异常", alias, id, e);
+            log.error("获取alias={}, path={}子路径异常", alias, id, e);
+            userResp.fail(RespCode.ERROR_99999);
+        }
+        return userResp;
+    }
+
+    @DeleteMapping(value = "/path/{alias}")
+    @ResponseBody
+    public Resp<String> deletePath(@PathVariable(value = "alias") String alias,
+                                   @RequestParam(value = "dataVersion") Integer dataVersion,
+                                   @RequestParam(value = "pathId") String pathId) {
+        Resp<String> userResp = new Resp<>();
+        try {
+            zkInfoService.deletePath(alias, pathId, dataVersion);
+            userResp.success(null);
+        } catch (AdminException e) {
+            log.error("删除alias={}, path={}节点失败: {}", alias, pathId, e.getCodeMsg());
+            userResp.fail(e);
+        } catch (Exception e) {
+            log.error("删除alias={}, path={}节点异常", alias, pathId, e);
+            userResp.fail(RespCode.ERROR_99999);
+        }
+        return userResp;
+    }
+
+    @PostMapping(value = "/path/{alias}")
+    @ResponseBody
+    public Resp<String> createPath(@PathVariable(value = "alias") String alias,
+                                   @RequestParam(value = "pathId") String pathId,
+                                   @RequestParam(value = "data", required = false) String data,
+                                   @RequestParam(value = "createMode", required = false, defaultValue = "0") Integer createMode) {
+        Resp<String> userResp = new Resp<>();
+        try {
+            userResp.success(zkInfoService.createPath(alias, pathId, data, createMode));
+        } catch (AdminException e) {
+            log.error("创建alias={}, path={}节点失败: {}", alias, pathId, e.getCodeMsg());
+            userResp.fail(e);
+        } catch (Exception e) {
+            log.error("创建alias={}, path={}节点异常", alias, pathId, e);
+            userResp.fail(RespCode.ERROR_99999);
+        }
+        return userResp;
+    }
+
+    @GetMapping(value = "/path/data/{alias}")
+    @ResponseBody
+    public Resp<PathDataVO> getPathData(@PathVariable(value = "alias") String alias,
+                                        @RequestParam(value = "pathId", required = false, defaultValue = "") String pathId) {
+        Resp<PathDataVO> userResp = new Resp<>();
+        try {
+            userResp.success(StringUtils.isEmpty(pathId) ? null : zkInfoService.getPathData(alias, pathId));
+        } catch (AdminException e) {
+            log.error("获取alias={}, path={}数据失败: {}", alias, pathId, e.getCodeMsg());
+            userResp.fail(e);
+        } catch (Exception e) {
+            log.error("获取alias={}, path={}数据异常", alias, pathId, e);
             userResp.fail(RespCode.ERROR_99999);
         }
         return userResp;

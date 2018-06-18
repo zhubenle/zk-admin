@@ -3,6 +3,7 @@ package cn.zk.service.impl;
 import cn.zk.app.config.CuratorClientProperties;
 import cn.zk.common.AdminException;
 import cn.zk.common.RespCode;
+import cn.zk.entity.PathDataVO;
 import cn.zk.entity.PathVO;
 import cn.zk.entity.ZkInfo;
 import cn.zk.manager.DefaultCuratorManager;
@@ -11,6 +12,7 @@ import cn.zk.repository.ZkInfoRepository;
 import cn.zk.service.ZkInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -19,6 +21,7 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -59,7 +62,7 @@ public class ZkInfoServiceImpl implements ZkInfoService {
     }
 
     @Override
-    public List<PathVO> listZkChildrenPath(String alias, String pathName, String pathId) {
+    public List<PathVO> listZkChildrenPath(String alias, String pathId) {
         DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
                 .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
         List<PathVO> result = curatorManager.listChildrenPath(StringUtils.isEmpty(pathId) ? File.separator : pathId)
@@ -70,9 +73,38 @@ public class ZkInfoServiceImpl implements ZkInfoService {
 
         if (StringUtils.isEmpty(pathId)) {
             List<PathVO> temp = new ArrayList<>();
-            temp.add(new PathVO(File.separator, true).withOpen(true).withChildren(result).withId(pathId));
+            temp.add(new PathVO(File.separator, true).withOpen(true).withChildren(result).withId(StringUtils.isEmpty(pathId) ? File.separator : pathId));
             result = temp;
         }
         return result;
+    }
+
+    @Override
+    public void deletePath(String alias, String pathId, Integer dataVersion) {
+        if (Objects.isNull(dataVersion)) {
+            throw new AdminException(RespCode.ERROR_10004);
+        }
+        DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
+                .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
+        curatorManager.deletePath(pathId, dataVersion);
+    }
+
+    @Override
+    public String createPath(String alias, String pathId, String data, Integer createMode) {
+        if (Objects.isNull(pathId)) {
+            throw new AdminException(RespCode.ERROR_10004);
+        }
+        DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
+                .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
+        return curatorManager.createPath(pathId, data, null, createMode);
+    }
+
+    @Override
+    public PathDataVO getPathData(String alias, String pathId) {
+        DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
+                .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
+        Stat stat = new Stat();
+        String result = curatorManager.getPathData(pathId, stat);
+        return new PathDataVO(stat, result);
     }
 }

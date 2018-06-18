@@ -43,6 +43,10 @@ public class DateUtils {
      */
     public static final ThreadLocal<DateFormat> DATETIME_FORMATTER1 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     /**
+     * yyyy-MM-dd HH:mm:ss.SSS
+     */
+    public static final ThreadLocal<DateFormat> DATETIME_MS_FORMATTER1 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
+    /**
      * yyyyMMddHHmmss
      */
     public static final ThreadLocal<DateFormat> DATETIME_FORMATTER2 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyyMMddHHmmss"));
