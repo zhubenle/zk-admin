@@ -58,7 +58,7 @@ public class AdminController {
 
     @GetMapping(value = "/login")
     public String toLogin(ModelMap modelMap, @ModelAttribute(LOGIN_FAIL_MESSAGE) String loginFailMessage) {
-        log.error("loginFailMessage: {}", loginFailMessage);
+        log.warn("loginFailMessage: {}", loginFailMessage);
         modelMap.addAttribute(LOGIN_FAIL_MESSAGE, loginFailMessage);
         return "login";
     }

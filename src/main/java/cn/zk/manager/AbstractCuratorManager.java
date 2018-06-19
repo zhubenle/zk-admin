@@ -6,11 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.api.CreateBackgroundModeStatACLable;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.ZooTrace;
@@ -32,7 +30,7 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
     protected final CuratorFramework client;
 
     public AbstractCuratorManager(String zkHostPorts, CuratorClientProperties properties) {
-        log.info("zookeeper【{}】连接初始化...", zkHostPorts);
+        log.debug("zookeeper【{}】连接初始化...", zkHostPorts);
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(properties.getBaseSleepTimeMs(), properties.getMaxRetries());
         client = CuratorFrameworkFactory.builder().connectString(zkHostPorts).sessionTimeoutMs(properties.getSessionTimeoutMs())
                 .connectionTimeoutMs(properties.getConnectionTimeoutMs()).retryPolicy(retryPolicy).build();
@@ -62,24 +60,20 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
      */
     @SneakyThrows
     public List<String> listChildrenPath(String parentPath) {
+        log.debug("获取路径{}子路径名称列表", parentPath);
         return client.getChildren().forPath(parentPath);
     }
 
     @SneakyThrows
     public void deletePath(String path, Integer version) {
+        log.debug("删除路径{}, version={}", path, version);
         client.delete().guaranteed().deletingChildrenIfNeeded().withVersion(version).forPath(path);
     }
 
     @SneakyThrows
     public String createPath(String path, String data, List<ACL> acls, int createMode) {
-        CreateBackgroundModeStatACLable createBackgroundModeStatACLable = client.create().compressed();
-        if (Objects.nonNull(acls)) {
-            createBackgroundModeStatACLable.withACL(acls);
-        }
-        if (Objects.nonNull(createMode)) {
-            createBackgroundModeStatACLable.withMode(CreateMode.fromFlag(createMode));
-        }
-        return createBackgroundModeStatACLable.forPath(path, data.getBytes(DEFAULT_CHARSET));
+        log.debug("创建路径{}, data={}, createMode={}", path, data, createMode);
+        return  client.create().creatingParentsIfNeeded().forPath(path, data.getBytes());
     }
 
     /**
@@ -92,16 +86,20 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
      */
     @SneakyThrows
     public boolean checkPathExist(String path) {
+        log.debug("检查路径{}是否存在", path);
         return Objects.nonNull(getPathStat(path));
     }
 
     @SneakyThrows
     public Stat getPathStat(String path) {
+        log.debug("获取路径{}的元信息", path);
         return client.checkExists().forPath(path);
     }
 
     @SneakyThrows
     public String getPathData(String path, Stat stat) {
-        return new String(client.getData().storingStatIn(stat).forPath(path), DEFAULT_CHARSET);
+        log.debug("获取路径{}的数据", path);
+        byte[] data = client.getData().storingStatIn(stat).forPath(path);
+        return Objects.nonNull(data) ? new String(data) : "";
     }
 }

@@ -1,9 +1,7 @@
 package cn.zk.curator.test;
 
 import cn.zk.app.config.CuratorClientProperties;
-import cn.zk.entity.PathVO;
 import cn.zk.manager.DefaultCuratorManager;
-import com.alibaba.fastjson.JSONObject;
 import org.junit.Test;
 
 /**
@@ -22,12 +20,10 @@ public class CuratorManagerTest {
         clientProperties.setMaxRetries(3);
         clientProperties.setSessionTimeoutMs(60000);
         DefaultCuratorManager curatorManager = new DefaultCuratorManager("127.0.0.1:2181", clientProperties);
-        curatorManager.createPath("/search/manage/test", "a", null, 0);
+        System.out.println(curatorManager.createPath("/search/manage/ccc", "ccc", null, 0));
     }
 
     @Test
     public void testJson() {
-        PathVO pathVO = new PathVO("/", true);
-        System.out.println(JSONObject.toJSONString(pathVO));
     }
 }

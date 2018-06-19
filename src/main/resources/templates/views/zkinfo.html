@@ -29,6 +29,7 @@
                     <button class="btn btn-danger" id="btn_delete">删除</button>
                 </div>
             </div>
+            <hr>
             <div class="row">
                 <div class="col-md-4">
                     <div id="ztree" class="ztree"></div>
@@ -81,7 +82,7 @@
                             <td id="numChildren"></td>
                         </tr>
                         <tr>
-                            <td colspan="2"><code id="path_data"></code></td>
+                            <td colspan="2"><span id="path_data"></span></td>
                         </tr>
                         </tbody>
                     </table>
@@ -101,21 +102,26 @@
             <div class="modal-body">
                 <form id="form_path" class="form-horizontal">
                     <div class="form-group">
-                        <label for="modal_input_pathName" class="control-label col-sm-4">节点名称</label>
+                        <label for="modal_input_pathName" class="control-label col-sm-3">节点名称</label>
                         <div class="col-sm-7">
                             <input type="text" class="form-control" id="modal_input_pathName" maxlength="20" autocomplete="new-password">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="modal_input_data" class="control-label col-sm-4">数据</label>
+                        <label for="modal_input_data" class="control-label col-sm-3">数据</label>
                         <div class="col-sm-7">
-                            <textarea class="form-control" id="modal_input_data" autocomplete="new-password"/>
+                            <textarea class="form-control" id="modal_input_data"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="modal_input_createMode" class="control-label col-sm-4">节点类型</label>
+                        <label for="modal_select_createMode" class="control-label col-sm-3">节点类型</label>
                         <div class="col-sm-7">
-                            <textarea class="form-control" id="modal_input_createMode" autocomplete="new-password"/>
+                            <select class="form-control" style="width: 100%;" id="modal_select_createMode">
+                                <option value="0">PERSISTENT</option>
+                                <option value="2">PERSISTENT_SEQUENTIAL</option>
+                                <option value="1">EPHEMERAL</option>
+                                <option value="3">EPHEMERAL_SEQUENTIAL</option>
+                            </select>
                         </div>
                     </div>
                 </form>
@@ -123,6 +129,48 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 <button type="button" class="btn btn-primary" id="btn_path_submit">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="modal_path_edit" tabindex="-1" role="dialog" aria-labelledby="modalPath">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal_path_edit_title"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="form_path_edit" class="form-horizontal">
+                    <div class="form-group">
+                        <label for="modal_input_edit_pathName" class="control-label col-sm-3">节点名称</label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" id="modal_input_edit_pathName" maxlength="20" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_input_edit_data" class="control-label col-sm-3">数据</label>
+                        <div class="col-sm-7">
+                            <textarea class="form-control" id="modal_input_edit_data"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_select_edit_createMode" class="control-label col-sm-3">节点类型</label>
+                        <div class="col-sm-7">
+                            <select class="form-control" style="width: 100%;" id="modal_select_edit_createMode">
+                                <option value="0">PERSISTENT</option>
+                                <option value="2">PERSISTENT_SEQUENTIAL</option>
+                                <option value="1">EPHEMERAL</option>
+                                <option value="3">EPHEMERAL_SEQUENTIAL</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_path_edit_submit">提交</button>
             </div>
         </div>
     </div>
@@ -197,6 +245,7 @@
         }
     };
     $(document).ready(function () {
+        $("#modal_select_createMode").select2();
         $.fn.zTree.init($("#ztree"), setting);
     });
 
@@ -260,25 +309,15 @@
         });
     });
 
+    //------add path
     var modalPath = $("#modal_path");
     var modalPathName = $("#modal_input_pathName");
     var modalData = $("#modal_input_data");
-    var modalCreateMode = $("#modal_input_createMode");
+    var modalCreateMode = $("#modal_select_createMode");
 
     modalPath.on("hidden.bs.modal", function () {
         modalPath.find("div .form-group").removeClass("has-error");
-        modalPath.find("input").val("");
-    });
-
-    $("#btn_edit").on("click", function () {
-        var zTree = $.fn.zTree.getZTreeObj("ztree");
-        var nodes = zTree.getSelectedNodes();
-        if (nodes.length === 0) {
-            swal("选择一个节点", "你必须选择一个节点, 再编辑", "error");
-            return;
-        }
-        modalPath.find("#modal_path_title").html("编辑节点");
-        modalPath.modal();
+        modalPath.find("input,textarea").val("");
     });
 
     $("#btn_add").on("click", function () {
@@ -301,15 +340,18 @@
             }
         });
         if (submit) {
+            modalPath.modal("hide");
             var zTree = $.fn.zTree.getZTreeObj("ztree");
             var nodes = zTree.getSelectedNodes();
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: contextPath + "/path/" + alias + "?createMode=" + modalCreateMode + "&data=" + modalData + "&pathId=" + nodes[0].id + "/" + modalPathName,
+                url: contextPath + "/path/" + alias,
+                data: "createMode=" + modalCreateMode.val() + "&data=" + modalData.val() + "&pathId=" + nodes[0].id + "/" + modalPathName.val(),
                 success: function (data) {
                     if (10000 === data.code) {
-                        zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+                        var node = nodes[0].isParent ? nodes[0] : nodes[0].getParentNode();
+                        zTree.reAsyncChildNodes(node, "refresh", true);
                         swal("添加成功", "节点" + data.data + "添加成功", "success");
                     } else {
                         swal("添加节点失败", data.msg, "error");
@@ -317,6 +359,71 @@
                 },
                 error: function (textStatus, errorThrown) {
                     swal("添加节点失败", textStatus + " " + errorThrown.toString(), "error");
+                }
+            });
+        }
+    });
+    //---------edit path
+    var modalPathEdit = $("#modal_path_edit");
+    var modalEditPathName = $("#modal_input_edit_pathName");
+    var modalEditData = $("#modal_input_edit_data");
+    var modalEditCreateMode = $("#modal_select_edit_createMode");
+
+    modalPathEdit.on("hidden.bs.modal", function () {
+        modalPathEdit.find("div .form-group").removeClass("has-error");
+        modalPathEdit.find("input,textarea").val("").removeAttr("disabled");
+    });
+
+    $("#btn_edit").on("click", function () {
+        var zTree = $.fn.zTree.getZTreeObj("ztree");
+        var nodes = zTree.getSelectedNodes();
+        if (nodes.length === 0) {
+            swal("选择一个节点", "你必须选择一个节点添加子节点, 再修改", "error");
+            return;
+        }
+        modalPathEdit.find("#modal_path_title").html("修改节点");
+        if (nodes[0].isParent) {
+            modalEditPathName.attr("disabled", "disabled");
+        }
+        modalEditPathName.val(nodes[0].name);
+        modalEditData.val($("#path_data").html());
+        var selected;
+        if ($("#ephemeralOwner").val() === "0") {
+            selected = "0";
+        } else {
+            selected = "1";
+        }
+        $("#modal_select_createMode").select2().val(selected);
+        modalPathEdit.modal();
+    });
+    $("#btn_path_edit_submit").on("click", function () {
+        var submit = true;
+        modalPath.find("input[type!='hidden']").each(function () {
+            if ($(this).val().trim() === "") {
+                submit = false;
+                $(this).parents("div .form-group").addClass("has-error");
+            }
+        });
+        if (submit) {
+            modalPath.modal("hide");
+            var zTree = $.fn.zTree.getZTreeObj("ztree");
+            var nodes = zTree.getSelectedNodes();
+            $.ajax({
+                type: "PUT",
+                dataType: "json",
+                url: contextPath + "/path/" + alias,
+                data: "createMode=" + modalCreateMode.val() + "&data=" + modalData.val() + "&pathId=" + nodes[0].id + "/" + modalPathName.val(),
+                success: function (data) {
+                    if (10000 === data.code) {
+                        var node = nodes[0].getParentNode();
+                        zTree.reAsyncChildNodes(node, "refresh", true);
+                        swal("修改成功", "节点" + data.data + "修改成功", "success");
+                    } else {
+                        swal("修改节点失败", data.msg, "error");
+                    }
+                },
+                error: function (textStatus, errorThrown) {
+                    swal("修改节点失败", textStatus + " " + errorThrown.toString(), "error");
                 }
             });
         }

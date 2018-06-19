@@ -32,10 +32,12 @@ public class PathDataVO {
         this.czxId = stat.getCzxid();
         this.mzxId = stat.getMzxid();
         this.cTime = stat.getCtime();
+        this.cTimeStr = "";
         if (cTime != 0) {
             this.cTimeStr = DateUtils.format(new Date(cTime), DateUtils.DATETIME_MS_FORMATTER1.get());
         }
         this.mTime = stat.getMtime();
+        this.mTimeStr = "";
         if (mTime != 0) {
             this.mTimeStr = DateUtils.format(new Date(mTime), DateUtils.DATETIME_MS_FORMATTER1.get());
         }
