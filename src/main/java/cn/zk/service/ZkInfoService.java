@@ -69,14 +69,34 @@ public interface ZkInfoService {
      *         别名
      * @param pathId
      *         节点路径
-     * @param createMode
-     *         节点类型
      * @param data
      *         节点数据
+     * @param createMode
+     *         节点类型
      *
      * @return 节点路径
      */
     String createPath(String alias, String pathId, String data, Integer createMode);
+
+    /**
+     * 更新节点
+     *
+     * @param alias
+     *         别名
+     * @param newPathId
+     *         新节点路径
+     * @param oldPathId
+     *         旧节点路径
+     * @param data
+     *         节点数据
+     * @param version
+     *         节点数据版本
+     * @param createMode
+     *         节点类型
+     *
+     * @return 节点路径
+     */
+    String updatePath(String alias, String newPathId, String oldPathId, String data, Integer version, Integer createMode);
 
     /**
      * 获取指定path的数据

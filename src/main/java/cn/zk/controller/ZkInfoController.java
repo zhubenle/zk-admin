@@ -147,6 +147,27 @@ public class ZkInfoController {
         return userResp;
     }
 
+    @PatchMapping(value = "/path/{alias}")
+    @ResponseBody
+    public Resp<String> updatePath(@PathVariable(value = "alias") String alias,
+                                   @RequestParam(value = "newPathId") String newPathId,
+                                   @RequestParam(value = "oldPathId") String oldPathId,
+                                   @RequestParam(value = "dataVersion") Integer dataVersion,
+                                   @RequestParam(value = "data", required = false) String data,
+                                   @RequestParam(value = "createMode") Integer createMode) {
+        Resp<String> userResp = new Resp<>();
+        try {
+            userResp.success(zkInfoService.updatePath(alias, newPathId, oldPathId, data, dataVersion, createMode));
+        } catch (AdminException e) {
+            log.error("修改alias={}, path={}节点失败: {}", alias, oldPathId, e.getCodeMsg());
+            userResp.fail(e);
+        } catch (Exception e) {
+            log.error("修改alias={}, path={}节点异常", alias, oldPathId, e);
+            userResp.fail(RespCode.ERROR_99999);
+        }
+        return userResp;
+    }
+
     @GetMapping(value = "/path/data/{alias}")
     @ResponseBody
     public Resp<PathDataVO> getPathData(@PathVariable(value = "alias") String alias,

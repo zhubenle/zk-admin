@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +33,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Service
 public class ZkInfoServiceImpl implements ZkInfoService {
+
+    private final static String SEPARATOR = "/";
 
     private final ZkInfoRepository zkInfoRepository;
     private final CuratorManagerFactory curatorManagerFactory;
@@ -65,15 +66,16 @@ public class ZkInfoServiceImpl implements ZkInfoService {
     public List<PathVO> listZkChildrenPath(String alias, String pathId) {
         DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
                 .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
-        List<PathVO> result = curatorManager.listChildrenPath(StringUtils.isEmpty(pathId) ? File.separator : pathId)
+        String tempPathId = StringUtils.isEmpty(pathId) ? SEPARATOR : pathId;
+        List<PathVO> result = curatorManager.listChildrenPath(tempPathId)
                 .stream()
-                .map(s -> new PathVO(s, curatorManager.getPathStat(pathId + File.separator + s).getNumChildren() > 0)
-                        .withId(pathId + File.separator + s))
-                .collect(Collectors.toList());
+                .map(s -> new PathVO(s, curatorManager.getPathStat(tempPathId + (SEPARATOR.equals(tempPathId) ? "" : SEPARATOR) + s).getNumChildren() > 0)
+                        .withId(tempPathId + (SEPARATOR.equals(tempPathId) ? "" : SEPARATOR) + s))
+                .sorted((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName())).collect(Collectors.toList());
 
         if (StringUtils.isEmpty(pathId)) {
             List<PathVO> temp = new ArrayList<>();
-            temp.add(new PathVO(File.separator, true).withOpen(true).withChildren(result).withId(StringUtils.isEmpty(pathId) ? File.separator : pathId));
+            temp.add(new PathVO(tempPathId, true).withOpen(true).withChildren(result).withId(tempPathId));
             result = temp;
         }
         return result;
@@ -97,6 +99,21 @@ public class ZkInfoServiceImpl implements ZkInfoService {
         DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
                 .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
         return curatorManager.createPath(pathId, data, null, createMode);
+    }
+
+    @Override
+    public String updatePath(String alias, String newPathId, String oldPathId, String data, Integer version, Integer createMode) {
+        DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
+                .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
+        if (newPathId.equals(oldPathId)) {
+            //更新节点数据
+            curatorManager.setPathData(oldPathId, data, version);
+            return oldPathId;
+        }
+        //添加新节点，删除旧节点
+        String pathId = curatorManager.createPath(newPathId, data, null, createMode);
+        curatorManager.deletePath(oldPathId, version);
+        return pathId;
     }
 
     @Override

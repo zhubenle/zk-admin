@@ -102,4 +102,10 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
         byte[] data = client.getData().storingStatIn(stat).forPath(path);
         return Objects.nonNull(data) ? new String(data) : "";
     }
+
+    @SneakyThrows
+    public Stat setPathData(String path, String data, Integer version) {
+        log.debug("设置路径{}的数据", path);
+        return client.setData().withVersion(version).forPath(path, data.getBytes());
+    }
 }

@@ -343,11 +343,12 @@
             modalPath.modal("hide");
             var zTree = $.fn.zTree.getZTreeObj("ztree");
             var nodes = zTree.getSelectedNodes();
+            var pathId = nodes[0].id + (!nodes[0].getParentNode() ? "" : "/") + modalPathName.val();
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: contextPath + "/path/" + alias,
-                data: "createMode=" + modalCreateMode.val() + "&data=" + modalData.val() + "&pathId=" + nodes[0].id + "/" + modalPathName.val(),
+                data: "createMode=" + modalCreateMode.val() + "&data=" + modalData.val() + "&pathId=" + pathId,
                 success: function (data) {
                     if (10000 === data.code) {
                         var node = nodes[0].isParent ? nodes[0] : nodes[0].getParentNode();
@@ -398,24 +399,27 @@
     });
     $("#btn_path_edit_submit").on("click", function () {
         var submit = true;
-        modalPath.find("input[type!='hidden']").each(function () {
+        modalPathEdit.find("input[type!='hidden']").each(function () {
             if ($(this).val().trim() === "") {
                 submit = false;
                 $(this).parents("div .form-group").addClass("has-error");
             }
         });
         if (submit) {
-            modalPath.modal("hide");
+            modalPathEdit.modal("hide");
             var zTree = $.fn.zTree.getZTreeObj("ztree");
             var nodes = zTree.getSelectedNodes();
+            var oldPathId = nodes[0].id;
+            var newPathId = nodes[0].isParent ? nodes[0].id : nodes[0].getParentNode().id + "/" + modalEditPathName.val();
             $.ajax({
-                type: "PUT",
+                type: "PATCH",
                 dataType: "json",
-                url: contextPath + "/path/" + alias,
-                data: "createMode=" + modalCreateMode.val() + "&data=" + modalData.val() + "&pathId=" + nodes[0].id + "/" + modalPathName.val(),
+                url: contextPath + "path/" + alias + "?createMode=" + modalEditCreateMode.val() + "&data=" + modalEditData.val() + "&oldPathId=" + oldPathId
+                + "&newPathId=" + newPathId + "&dataVersion=" + $("#dataVersion").html(),
                 success: function (data) {
                     if (10000 === data.code) {
                         var node = nodes[0].getParentNode();
+                        zTree.selectNode(node);
                         zTree.reAsyncChildNodes(node, "refresh", true);
                         swal("修改成功", "节点" + data.data + "修改成功", "success");
                     } else {
