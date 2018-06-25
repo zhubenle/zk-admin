@@ -3,6 +3,7 @@ package cn.zk.manager.factory;
 import cn.zk.manager.AbstractCuratorManager;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
 @Component
 public class CuratorManagerFactory {
 
-    private Map<String, AbstractCuratorManager> managerMap;
+    private Map<String, AbstractCuratorManager> managerMap = new HashMap<>();
 
     /**
      * 获取manager
