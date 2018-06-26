@@ -400,7 +400,7 @@
             swal("选择一个节点", "你必须选择一个节点添加子节点, 再修改", "error");
             return;
         }
-        modalPathEdit.find("#modal_path_title").html("修改节点");
+        modalPathEdit.find("#modal_path_edit_title").html("修改节点");
         modalEditPathName.val(nodes[0].name);
         var selected;
         if ($("#ephemeralOwner").val() === "0") {
