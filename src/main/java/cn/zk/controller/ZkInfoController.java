@@ -92,6 +92,9 @@ public class ZkInfoController {
         return "views/zkinfo";
     }
 
+    /**
+     * 获取zookeeper路径下的子路径列表
+     */
     @GetMapping(value = "/path/{alias}")
     @ResponseBody
     public Resp<List<PathVO>> ajaxGetPath(@PathVariable(value = "alias") String alias,
@@ -109,6 +112,9 @@ public class ZkInfoController {
         return userResp;
     }
 
+    /**
+     * 删除zookeeper指定路径
+     */
     @DeleteMapping(value = "/path/{alias}")
     @ResponseBody
     public Resp<String> ajaxDeletePath(@PathVariable(value = "alias") String alias,
@@ -128,6 +134,9 @@ public class ZkInfoController {
         return userResp;
     }
 
+    /**
+     * 添加zookeeper路径
+     */
     @PostMapping(value = "/path/add/{alias}")
     @ResponseBody
     public Resp<String> ajaxCreatePath(@PathVariable(value = "alias") String alias,
@@ -147,6 +156,9 @@ public class ZkInfoController {
         return userResp;
     }
 
+    /**
+     * 编辑zookeeper路径(有子节点的路径只能修改值，没子节点的路径都可以修改)
+     */
     @PostMapping(value = "/path/edit/{alias}")
     @ResponseBody
     public Resp<String> ajaxEditPath(@PathVariable(value = "alias") String alias,
@@ -168,6 +180,9 @@ public class ZkInfoController {
         return userResp;
     }
 
+    /**
+     * 获取zookeeper路径节点的数据和状态信息
+     */
     @GetMapping(value = "/path/data/{alias}")
     @ResponseBody
     public Resp<PathDataVO> ajaxGetPathData(@PathVariable(value = "alias") String alias,

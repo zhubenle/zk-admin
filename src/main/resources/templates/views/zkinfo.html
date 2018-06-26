@@ -390,7 +390,7 @@
     modalPathEdit.on("hidden.bs.modal", function () {
         modalPathEdit.find("input[type!='hidden']").parent("div").removeClass("has-error");
         modalPathEdit.find("input").val("").removeAttr("disabled");
-        CKEDITOR.instances.modal_input_edit_data.setData("");
+        modalEditCreateMode.select2({"disabled": false});
     });
 
     $("#btn_edit").on("click", function () {
@@ -401,9 +401,6 @@
             return;
         }
         modalPathEdit.find("#modal_path_title").html("修改节点");
-        if (nodes[0].isParent) {
-            modalEditPathName.attr("disabled", "disabled");
-        }
         modalEditPathName.val(nodes[0].name);
         var selected;
         if ($("#ephemeralOwner").val() === "0") {
@@ -411,7 +408,11 @@
         } else {
             selected = "1";
         }
-        $("#modal_select_createMode").select2().val(selected);
+        modalEditCreateMode.select2().val(selected);
+        if (nodes[0].isParent) {
+            modalEditPathName.attr("disabled", "disabled");
+            modalEditCreateMode.select2({"disabled": true});
+        }
 
         $.ajax({
             type: "GET",
