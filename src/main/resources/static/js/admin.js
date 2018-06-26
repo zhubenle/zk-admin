@@ -9,6 +9,9 @@ $(function () {
 $(window).resize(function () {
     pageInitModule.setWidth();
 });
+$(window).scroll(function () {
+    pageInitModule.setScrollToTop();
+});
 
 var pageInitModule = (function (mod) {
     mod.setWidth = function () {
@@ -18,6 +21,14 @@ var pageInitModule = (function (mod) {
         } else {
             $(".sidebar").css({left: 0});
             $(".all").css({marginLeft: 220});
+        }
+    };
+    mod.setScrollToTop = function () {
+        var top = $(window).scrollTop();
+        if (top < 60) {
+            $('#goTop').hide();
+        } else {
+            $('#goTop').show();
         }
     };
     mod.setSidebar = function () {

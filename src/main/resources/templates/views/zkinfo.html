@@ -18,7 +18,7 @@
     </div>
     <div class="maincontent row">
         <ul class="breadcrumb">
-            <li class="active">zookeeper连接</li>
+            <li class="active" th:text="${zkinfo.hosts}"></li>
         </ul>
         <div class="col-sm-12">
             <div class="row">
@@ -36,6 +36,12 @@
                 </div>
                 <div class="col-md-8">
                     <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th width="20px">当前路径</th>
+                            <th id="currentPath"></th>
+                        </tr>
+                        </thead>
                         <tbody>
                         <tr>
                             <td width="20px">cZxid</td>
@@ -82,7 +88,9 @@
                             <td id="numChildren"></td>
                         </tr>
                         <tr>
-                            <td colspan="2"><span id="path_data"></span></td>
+                            <td colspan="2">
+                                <pre><code id="path_data"></code></pre>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -91,9 +99,9 @@
         </div>
     </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="modal_path" tabindex="-1" role="dialog" aria-labelledby="modalPath">
-    <div class="modal-dialog" role="document">
+<!-- Modal Add-->
+<div class="modal fade bs-example-modal-lg" id="modal_path" tabindex="-1" role="dialog" aria-labelledby="modalPath">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -102,26 +110,24 @@
             <div class="modal-body">
                 <form id="form_path" class="form-horizontal">
                     <div class="form-group">
-                        <label for="modal_input_pathName" class="control-label col-sm-3">节点名称</label>
-                        <div class="col-sm-7">
-                            <input type="text" class="form-control" id="modal_input_pathName" maxlength="20" autocomplete="new-password">
+                        <label for="modal_input_pathName" class="control-label col-sm-1">名称</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="modal_input_pathName" maxlength="100" autocomplete="new-password">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="modal_input_data" class="control-label col-sm-3">数据</label>
-                        <div class="col-sm-7">
-                            <textarea class="form-control" id="modal_input_data"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="modal_select_createMode" class="control-label col-sm-3">节点类型</label>
-                        <div class="col-sm-7">
+                        <label for="modal_select_createMode" class="control-label col-sm-1">类型</label>
+                        <div class="col-sm-3">
                             <select class="form-control" style="width: 100%;" id="modal_select_createMode">
                                 <option value="0">PERSISTENT</option>
                                 <option value="2">PERSISTENT_SEQUENTIAL</option>
                                 <option value="1">EPHEMERAL</option>
                                 <option value="3">EPHEMERAL_SEQUENTIAL</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_input_data" class="control-label col-sm-1">数据</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="modal_input_data"></textarea>
                         </div>
                     </div>
                 </form>
@@ -133,9 +139,9 @@
         </div>
     </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="modal_path_edit" tabindex="-1" role="dialog" aria-labelledby="modalPath">
-    <div class="modal-dialog" role="document">
+<!-- Modal Update-->
+<div class="modal fade bs-example-modal-lg" id="modal_path_edit" tabindex="-1" role="dialog" aria-labelledby="modalPath">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -144,26 +150,24 @@
             <div class="modal-body">
                 <form id="form_path_edit" class="form-horizontal">
                     <div class="form-group">
-                        <label for="modal_input_edit_pathName" class="control-label col-sm-3">节点名称</label>
-                        <div class="col-sm-7">
-                            <input type="text" class="form-control" id="modal_input_edit_pathName" maxlength="20" autocomplete="new-password">
+                        <label for="modal_input_edit_pathName" class="control-label col-sm-1">名称</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="modal_input_edit_pathName" maxlength="100" autocomplete="new-password">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="modal_input_edit_data" class="control-label col-sm-3">数据</label>
-                        <div class="col-sm-7">
-                            <textarea class="form-control" id="modal_input_edit_data"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="modal_select_edit_createMode" class="control-label col-sm-3">节点类型</label>
-                        <div class="col-sm-7">
+                        <label for="modal_select_edit_createMode" class="control-label col-sm-1">类型</label>
+                        <div class="col-sm-3">
                             <select class="form-control" style="width: 100%;" id="modal_select_edit_createMode">
                                 <option value="0">PERSISTENT</option>
                                 <option value="2">PERSISTENT_SEQUENTIAL</option>
                                 <option value="1">EPHEMERAL</option>
                                 <option value="3">EPHEMERAL_SEQUENTIAL</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_input_edit_data" class="control-label col-sm-1">数据</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="modal_input_edit_data"></textarea>
                         </div>
                     </div>
                 </form>
@@ -175,6 +179,7 @@
         </div>
     </div>
 </div>
+<a href="#top" id="goTop"><i class="fa fa-angle-up fa-3x"></i></a>
 <div th:replace="~{base::script}"></div>
 <script th:inline="javascript">
     var failMessage = /*[[${zkInfoFailMessage}]]*/ "";
@@ -216,9 +221,9 @@
                             if (10000 === data.code) {
                                 if (data.data) {
                                     $("#cZxid").html(data.data.czxId);
-                                    $("#ctime").html(data.data.cTimeStr + "  毫秒[" + data.data.cTime + "]");
+                                    $("#ctime").html(data.data.cTime + "  [" + data.data.cTimeStr + "]");
                                     $("#mZxid").html(data.data.mzxId);
-                                    $("#mtime").html(data.data.mTimeStr + "  毫秒[" + data.data.mTime + "]");
+                                    $("#mtime").html(data.data.mTime + "  [" + data.data.mTimeStr + "]");
                                     $("#pZxid").html(data.data.pzxId);
                                     $("#cversion").html(data.data.cVersion);
                                     $("#dataVersion").html(data.data.version);
@@ -226,7 +231,8 @@
                                     $("#ephemeralOwner").html(data.data.ephemeralOwner);
                                     $("#dataLength").html(data.data.dataLength);
                                     $("#numChildren").html(data.data.numChildren);
-                                    $("#path_data").html(data.data.data);
+                                    $("#path_data").html(hljs.highlightAuto(data.data.data).value);
+                                    $("#currentPath").html(treeNode.id);
                                 } else {
                                     cleanTable();
                                 }
@@ -235,9 +241,9 @@
                                 swal("获取节点数据失败", data.msg, "error");
                             }
                         },
-                        error: function (textStatus, errorThrown) {
+                        error: function (status, errorThrown) {
                             cleanTable();
-                            swal("获取节点数据失败", textStatus + " " + errorThrown.toString(), "error");
+                            swal("获取节点数据失败", status.statusText + " " + errorThrown.toString(), "error");
                         }
                     });
                 }
@@ -247,6 +253,15 @@
     $(document).ready(function () {
         $("#modal_select_createMode").select2();
         $.fn.zTree.init($("#ztree"), setting);
+
+        var ckeditor_config = {
+            toolbar : [],
+            height: 300,
+            startupMode: "source",
+            removePlugins: "elementspath"
+        };
+        CKEDITOR.replace("modal_input_data", ckeditor_config);
+        CKEDITOR.replace("modal_input_edit_data", ckeditor_config);
     });
 
     function cleanTable() {
@@ -262,6 +277,7 @@
         $("#dataLength").html("");
         $("#numChildren").html("");
         $("#path_data").html("");
+        $("#currentPath").html("");
     }
 
     $("#btn_refresh").on("click", function () {
@@ -272,6 +288,7 @@
             return;
         }
         zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+        swal("刷新成功", "节点" + nodes[0].name + "刷新成功", "success");
     });
 
     $("#btn_delete").on("click", function () {
@@ -301,8 +318,8 @@
                             swal("删除节点失败", data.msg, "error");
                         }
                     },
-                    error: function (textStatus, errorThrown) {
-                        swal("删除节点失败", textStatus + " " + errorThrown.toString(), "error");
+                    error: function (status, errorThrown) {
+                        swal("删除节点失败", status.statusText + " " + errorThrown.toString(), "error");
                     }
                 });
             }
@@ -312,12 +329,12 @@
     //------add path
     var modalPath = $("#modal_path");
     var modalPathName = $("#modal_input_pathName");
-    var modalData = $("#modal_input_data");
     var modalCreateMode = $("#modal_select_createMode");
 
     modalPath.on("hidden.bs.modal", function () {
-        modalPath.find("div .form-group").removeClass("has-error");
-        modalPath.find("input,textarea").val("");
+        modalPath.find("input[type!='hidden']").parent("div").removeClass("has-error");
+        modalPath.find("input").val("");
+        CKEDITOR.instances.modal_input_data.setData("");
     });
 
     $("#btn_add").on("click", function () {
@@ -336,7 +353,7 @@
         modalPath.find("input[type!='hidden']").each(function () {
             if ($(this).val().trim() === "") {
                 submit = false;
-                $(this).parents("div .form-group").addClass("has-error");
+                $(this).parent("div").addClass("has-error");
             }
         });
         if (submit) {
@@ -347,8 +364,8 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: contextPath + "/path/" + alias,
-                data: "createMode=" + modalCreateMode.val() + "&data=" + modalData.val() + "&pathId=" + pathId,
+                url: contextPath + "/path/add/" + alias,
+                data: "createMode=" + modalCreateMode.val() + "&data=" +  CKEDITOR.instances.modal_input_data.getData() + "&pathId=" + pathId,
                 success: function (data) {
                     if (10000 === data.code) {
                         var node = nodes[0].isParent ? nodes[0] : nodes[0].getParentNode();
@@ -358,21 +375,22 @@
                         swal("添加节点失败", data.msg, "error");
                     }
                 },
-                error: function (textStatus, errorThrown) {
-                    swal("添加节点失败", textStatus + " " + errorThrown.toString(), "error");
+                error: function (status, errorThrown) {
+                    swal("添加节点失败", status.statusText + " " + errorThrown.toString(), "error");
                 }
             });
         }
     });
+
     //---------edit path
     var modalPathEdit = $("#modal_path_edit");
     var modalEditPathName = $("#modal_input_edit_pathName");
-    var modalEditData = $("#modal_input_edit_data");
     var modalEditCreateMode = $("#modal_select_edit_createMode");
 
     modalPathEdit.on("hidden.bs.modal", function () {
-        modalPathEdit.find("div .form-group").removeClass("has-error");
-        modalPathEdit.find("input,textarea").val("").removeAttr("disabled");
+        modalPathEdit.find("input[type!='hidden']").parent("div").removeClass("has-error");
+        modalPathEdit.find("input").val("").removeAttr("disabled");
+        CKEDITOR.instances.modal_input_edit_data.setData("");
     });
 
     $("#btn_edit").on("click", function () {
@@ -387,7 +405,6 @@
             modalEditPathName.attr("disabled", "disabled");
         }
         modalEditPathName.val(nodes[0].name);
-        modalEditData.val($("#path_data").html());
         var selected;
         if ($("#ephemeralOwner").val() === "0") {
             selected = "0";
@@ -395,14 +412,30 @@
             selected = "1";
         }
         $("#modal_select_createMode").select2().val(selected);
-        modalPathEdit.modal();
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: contextPath + "/path/data/" + alias + "?pathId=" + nodes[0].id,
+            success: function (data) {
+                if (10000 === data.code) {
+                    CKEDITOR.instances.modal_input_edit_data.setData(data.data.data);
+                    modalPathEdit.modal();
+                } else {
+                    swal("修改节点失败", data.msg, "error");
+                }
+            },
+            error: function (status, errorThrown) {
+                swal("修改节点失败", status.statusText + " " + errorThrown.toString(), "error");
+            }
+        });
     });
     $("#btn_path_edit_submit").on("click", function () {
         var submit = true;
         modalPathEdit.find("input[type!='hidden']").each(function () {
             if ($(this).val().trim() === "") {
                 submit = false;
-                $(this).parents("div .form-group").addClass("has-error");
+                $(this).parent("div").addClass("has-error");
             }
         });
         if (submit) {
@@ -412,9 +445,10 @@
             var oldPathId = nodes[0].id;
             var newPathId = nodes[0].isParent ? nodes[0].id : nodes[0].getParentNode().id + "/" + modalEditPathName.val();
             $.ajax({
-                type: "PATCH",
+                type: "POST",
                 dataType: "json",
-                url: contextPath + "path/" + alias + "?createMode=" + modalEditCreateMode.val() + "&data=" + modalEditData.val() + "&oldPathId=" + oldPathId
+                url: contextPath + "path/edit/" + alias,
+                data: "createMode=" + modalEditCreateMode.val() + "&data=" + CKEDITOR.instances.modal_input_edit_data.getData() + "&oldPathId=" + oldPathId
                 + "&newPathId=" + newPathId + "&dataVersion=" + $("#dataVersion").html(),
                 success: function (data) {
                     if (10000 === data.code) {
@@ -426,8 +460,8 @@
                         swal("修改节点失败", data.msg, "error");
                     }
                 },
-                error: function (textStatus, errorThrown) {
-                    swal("修改节点失败", textStatus + " " + errorThrown.toString(), "error");
+                error: function (status, errorThrown) {
+                    swal("修改节点失败", status.statusText + " " + errorThrown.toString(), "error");
                 }
             });
         }

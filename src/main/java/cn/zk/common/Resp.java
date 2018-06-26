@@ -28,6 +28,12 @@ public class Resp<T> {
         this.time = DateUtils.getCurrentDateTimeStr();
     }
 
+    public void fail(RespCode respCode, Throwable e) {
+        this.code = respCode.getCode();
+        this.msg = respCode.getMsg() + ": " + e.getMessage();
+        this.time = DateUtils.getCurrentDateTimeStr();
+    }
+
     public void fail(AdminException e) {
         this.code = e.getCode();
         this.msg = e.getMsg();

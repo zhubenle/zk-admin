@@ -6,7 +6,7 @@
 
     <groupId>com.zk</groupId>
     <artifactId>zk-admin</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <properties>
         <project.encoding>UTF-8</project.encoding>
@@ -157,6 +157,16 @@
                     <groupId>org.webjars</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>highlightjs</artifactId>
+            <version>9.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>ckeditor</artifactId>
+            <version>4.9.2</version>
         </dependency>
 
         <dependency>

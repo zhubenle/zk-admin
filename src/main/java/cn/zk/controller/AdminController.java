@@ -82,7 +82,7 @@ public class AdminController {
 
     @GetMapping(value = "/user/{id}")
     @ResponseBody
-    public Resp<User> getUser(@PathVariable(value = "id") Integer id) {
+    public Resp<User> ajaxObtainUser(@PathVariable(value = "id") Integer id) {
         Resp<User> userResp = new Resp<>();
         try {
             userResp.success(adminService.getUserById(id));
@@ -91,14 +91,14 @@ public class AdminController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("获取用户异常", e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }
 
     @DeleteMapping(value = "/user/{id}")
     @ResponseBody
-    public Resp<String> deleteUser(@PathVariable(value = "id") Integer id) {
+    public Resp<String> ajaxDeleteUser(@PathVariable(value = "id") Integer id) {
         Resp<String> userResp = new Resp<>();
         try {
             adminService.deleteUserById(id);
@@ -108,7 +108,7 @@ public class AdminController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("删除用户异常", e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }

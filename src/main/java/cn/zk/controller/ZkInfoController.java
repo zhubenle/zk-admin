@@ -43,7 +43,7 @@ public class ZkInfoController {
 
     @DeleteMapping(value = "/zkinfo/{alias}")
     @ResponseBody
-    public Resp<String> deleteZkInfo(@PathVariable(value = "alias") String alias) {
+    public Resp<String> ajaxDeleteZkInfo(@PathVariable(value = "alias") String alias) {
         Resp<String> userResp = new Resp<>();
         try {
             zkInfoService.deleteZkInfoByAlias(alias);
@@ -53,7 +53,7 @@ public class ZkInfoController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("删除zkInfo异常", e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }
@@ -94,7 +94,7 @@ public class ZkInfoController {
 
     @GetMapping(value = "/path/{alias}")
     @ResponseBody
-    public Resp<List<PathVO>> getPath(@PathVariable(value = "alias") String alias,
+    public Resp<List<PathVO>> ajaxGetPath(@PathVariable(value = "alias") String alias,
                                       @RequestParam(value = "id", required = false, defaultValue = "") String id) {
         Resp<List<PathVO>> userResp = new Resp<>();
         try {
@@ -104,14 +104,14 @@ public class ZkInfoController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("获取alias={}, path={}子路径异常", alias, id, e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }
 
     @DeleteMapping(value = "/path/{alias}")
     @ResponseBody
-    public Resp<String> deletePath(@PathVariable(value = "alias") String alias,
+    public Resp<String> ajaxDeletePath(@PathVariable(value = "alias") String alias,
                                    @RequestParam(value = "dataVersion") Integer dataVersion,
                                    @RequestParam(value = "pathId") String pathId) {
         Resp<String> userResp = new Resp<>();
@@ -123,14 +123,14 @@ public class ZkInfoController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("删除alias={}, path={}节点异常", alias, pathId, e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }
 
-    @PostMapping(value = "/path/{alias}")
+    @PostMapping(value = "/path/add/{alias}")
     @ResponseBody
-    public Resp<String> createPath(@PathVariable(value = "alias") String alias,
+    public Resp<String> ajaxCreatePath(@PathVariable(value = "alias") String alias,
                                    @RequestParam(value = "pathId") String pathId,
                                    @RequestParam(value = "data", required = false) String data,
                                    @RequestParam(value = "createMode", required = false, defaultValue = "0") Integer createMode) {
@@ -142,14 +142,14 @@ public class ZkInfoController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("创建alias={}, path={}节点异常", alias, pathId, e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }
 
-    @PatchMapping(value = "/path/{alias}")
+    @PostMapping(value = "/path/edit/{alias}")
     @ResponseBody
-    public Resp<String> updatePath(@PathVariable(value = "alias") String alias,
+    public Resp<String> ajaxEditPath(@PathVariable(value = "alias") String alias,
                                    @RequestParam(value = "newPathId") String newPathId,
                                    @RequestParam(value = "oldPathId") String oldPathId,
                                    @RequestParam(value = "dataVersion") Integer dataVersion,
@@ -163,14 +163,14 @@ public class ZkInfoController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("修改alias={}, path={}节点异常", alias, oldPathId, e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }
 
     @GetMapping(value = "/path/data/{alias}")
     @ResponseBody
-    public Resp<PathDataVO> getPathData(@PathVariable(value = "alias") String alias,
+    public Resp<PathDataVO> ajaxGetPathData(@PathVariable(value = "alias") String alias,
                                         @RequestParam(value = "pathId", required = false, defaultValue = "") String pathId) {
         Resp<PathDataVO> userResp = new Resp<>();
         try {
@@ -180,7 +180,7 @@ public class ZkInfoController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("获取alias={}, path={}数据异常", alias, pathId, e);
-            userResp.fail(RespCode.ERROR_99999);
+            userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;
     }

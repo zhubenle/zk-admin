@@ -15,6 +15,27 @@ html, body {
     }
 }
 
+#goTop {
+    padding: 5px 15px;
+    border-radius: 8px;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: none;
+    background-color: #aaa;
+    color: #fff;
+    text-align: center;
+    -moz-transition: background 0.5s linear;
+    -webkit-transition: background 0.5s linear;
+    -o-transition: background 0.5s linear;
+    transition: background 0.5s linear;
+    z-index: 99;
+}
+
+#goTop:hover {
+    background: #808080;
+}
+
 .all {
     margin-top: 50px;
     margin-left: 220px;
