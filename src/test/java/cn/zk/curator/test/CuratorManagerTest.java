@@ -19,8 +19,12 @@ public class CuratorManagerTest {
         clientProperties.setConnectionTimeoutMs(60000);
         clientProperties.setMaxRetries(3);
         clientProperties.setSessionTimeoutMs(60000);
-        DefaultCuratorManager curatorManager = new DefaultCuratorManager("127.0.0.1:2181", clientProperties);
-        System.out.println(curatorManager.createPath("/search/manage/ccc", "ccc", null, 0));
+        DefaultCuratorManager curatorManager = new DefaultCuratorManager("192.168.1.250:2181", clientProperties);
+        curatorManager.getACLs("/dubbo/cn.iautos.gg.api.banking.pa.service.IGGAdminService/providers").forEach(acl -> {
+            System.out.println(acl.getId().getId());
+            System.out.println(acl.getId().getScheme());
+            System.out.println(acl.getPerms());
+        });
     }
 
     @Test

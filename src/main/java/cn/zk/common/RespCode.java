@@ -15,6 +15,7 @@ public enum RespCode {
     ERROR_10002(10002, "admin用户不能删除"),
     ERROR_10003(10003, "别名不存在"),
     ERROR_10004(10004, "参数错误"),
+    ERROR_10005(10005, "zookeeper未连接"),
 
     ERROR_99999(99999, "系统异常")
     ;

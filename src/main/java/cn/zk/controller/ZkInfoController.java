@@ -73,8 +73,7 @@ public class ZkInfoController {
     }
 
     @GetMapping(value = "/zkinfo/{alias}")
-    public String toZkInfo(@PathVariable(value = "alias") String alias,
-                           ModelMap modelMap) {
+    public String toZkInfo(@PathVariable(value = "alias") String alias, ModelMap modelMap) {
         try {
             List<ZkInfo> zkInfos = zkInfoService.listAll();
             modelMap.addAttribute("zkinfos", zkInfos);
@@ -90,6 +89,22 @@ public class ZkInfoController {
             modelMap.addAttribute(ZKINFO_FAIL_MESSAGE, e.getMessage());
         }
         return "views/zkinfo";
+    }
+
+    @PostMapping(value = "/zkinfo/reconnect/{alias}")
+    @ResponseBody
+    public Resp<String> ajaxReconnectZk(@PathVariable(value = "alias") String alias) {
+        Resp<String> resp = new Resp<>();
+        try {
+
+        } catch (AdminException e) {
+            log.error("获取alias={}失败: {}", alias, e.getCodeMsg());
+            resp.fail(e);
+        } catch (Exception e) {
+            log.error("获取alias={}异常", alias, e);
+            resp.fail(RespCode.ERROR_99999, e);
+        }
+        return resp;
     }
 
     /**

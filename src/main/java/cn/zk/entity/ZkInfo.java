@@ -32,6 +32,9 @@ public class ZkInfo {
     @Column(name = "hosts", nullable = false, length = 1024)
     private String hosts;
 
+    @Column(name = "conn_state", nullable = true)
+    private String connState;
+
     @CreatedDate
     @Column(name = "create_time", nullable = false)
     private Date createTime;

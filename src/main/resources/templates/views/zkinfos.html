@@ -24,6 +24,7 @@
                     <tr>
                         <th>ID</th>
                         <th>别名</th>
+                        <th>连接状态</th>
                         <th>主机和端口</th>
                         <th>创建时间</th>
                         <th>操作</th>
@@ -33,9 +34,17 @@
                     <tr th:each="zkinfo:${zkinfos}">
                         <td th:text="${zkinfo.id}"></td>
                         <td th:text="${zkinfo.alias}"></td>
+                        <td>
+                            <span th:if="${zkinfo.connState=='CONNECTED'} or ${zkinfo.connState=='RECONNECTED'}"
+                                  class="label label-success" th:text="${zkinfo.connState}"></span>
+                            <span th:if="${zkinfo.connState=='READ_ONLY'}" class="label label-info" th:text="${zkinfo.connState}"></span>
+                            <span th:if="${zkinfo.connState=='SUSPENDED'}" class="label label-warning" th:text="${zkinfo.connState}"></span>
+                            <span th:if="${zkinfo.connState=='LOST'}" class="llabel label-danger" th:text="${zkinfo.connState}"></span>
+                        </td>
                         <td th:text="${zkinfo.hosts}"></td>
                         <td th:text="${zkinfo.createTime}"></td>
                         <td>
+                            <button type="button" class="btn btn-primary btn-sm" th:if="${zkinfo.connState=='LOST'}" th:value="${zkinfo.alias}" name="btn_reconnect">重新连接</button>
                             <button type="button" class="btn btn-danger btn-sm" th:value="${zkinfo.alias}" name="btn_delete">删除</button>
                         </td>
                     </tr>
@@ -102,6 +111,7 @@
             dangerMode: true
         }).then(function (willDelete) {
             if (willDelete) {
+                btn.attr("disabled", "disabled");
                 $.ajax({
                     type: "DELETE",
                     dataType: "json",
@@ -110,15 +120,39 @@
                         if (10000 === data.code) {
                             window.location.href = contextPath + "zkinfos";
                         } else {
-                            toastr["error"](data.msg);
+                            swal("删除" + btn.val() + "连接失败", data.msg, "error");
                         }
                     },
-                    error: function (textStatus, errorThrown) {
-                        toastr["error"](textStatus + " " + errorThrown.toString());
+                    error: function (status, errorThrown) {
+                        swal("删除" + btn.val() + "连接失败", status.statusText + " " + errorThrown.toString(), "error");
                     },
                     complete: function () {
+                        btn.removeAttr("disabled");
                     }
                 });
+            }
+        });
+    });
+
+    $("button[name='btn_reconnect']").on("click", function () {
+        var btn = $(this);
+        btn.attr("disabled", "disabled");
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: contextPath + "/zkinfo/reconnect/" + btn.val(),
+            success: function (data) {
+                if (10000 === data.code) {
+                    window.location.href = contextPath + "zkinfos";
+                } else {
+                    swal("重连" + btn.val() + "失败", data.msg, "error");
+                }
+            },
+            error: function (textStatus, errorThrown) {
+                swal("重连" + btn.val() + "失败", status.statusText + " " + errorThrown.toString(), "error");
+            },
+            complete: function () {
+                btn.removeAttr("disabled");
             }
         });
     });

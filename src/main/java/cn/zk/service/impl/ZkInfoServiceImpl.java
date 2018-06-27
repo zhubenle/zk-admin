@@ -8,6 +8,7 @@ import cn.zk.entity.PathVO;
 import cn.zk.entity.ZkInfo;
 import cn.zk.manager.DefaultCuratorManager;
 import cn.zk.manager.factory.CuratorManagerFactory;
+import cn.zk.manager.observer.ConnStateObserver;
 import cn.zk.repository.ZkInfoRepository;
 import cn.zk.service.ZkInfoService;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,15 @@ public class ZkInfoServiceImpl implements ZkInfoService {
     @Override
     public void saveZkInfo(ZkInfo zkInfo) {
         zkInfoRepository.save(zkInfo);
-        curatorManagerFactory.getManagerMap().put(zkInfo.getAlias(), new DefaultCuratorManager(zkInfo.getHosts(), curatorClientProperties));
+
+        DefaultCuratorManager curatorManager = new DefaultCuratorManager(zkInfo.getHosts(), curatorClientProperties);
+        curatorManager.addObserver(new ConnStateObserver(this));
+        curatorManagerFactory.getManagerMap().put(zkInfo.getAlias(), curatorManager);
+    }
+
+    @Override
+    public void updateZkInfoConnStateByHosts(String hosts, String connState) {
+        zkInfoRepository.updateConnStateByHosts(hosts, connState);
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -57,9 +66,17 @@ public class ZkInfoServiceImpl implements ZkInfoService {
         if (StringUtils.isEmpty(alias)) {
             throw new AdminException(RespCode.ERROR_10004);
         }
-        zkInfoRepository.deleteZkInfoByAliasEquals(alias);
         curatorManagerFactory.removeManager(alias);
+        zkInfoRepository.deleteZkInfoByAliasEquals(alias);
         log.info("删除ZkInfo, alias={}", alias);
+    }
+
+    @Override
+    public void reconnectZk(String alias) {
+        ZkInfo zkInfo = zkInfoRepository.getZkInfoByAliasEquals(alias);
+        DefaultCuratorManager curatorManager = new DefaultCuratorManager(zkInfo.getHosts(), curatorClientProperties);
+        curatorManager.addObserver(new ConnStateObserver(this));
+        curatorManagerFactory.getManagerMap().put(zkInfo.getAlias(), curatorManager);
     }
 
     @Override

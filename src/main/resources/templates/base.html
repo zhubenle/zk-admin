@@ -47,7 +47,7 @@
     <li><a th:href="@{/index}">首页</a></li>
     <li th:if="${session.session_user.id} == 1"><a th:href="@{/users}">用户管理</a></li>
     <li th:if="${session.session_user.id} == 1"><a th:href="@{/zkinfos}">zookeeper管理</a></li>
-    <li th:each="zkinfo:${zkinfos}"><a th:href="@{/zkinfo/{alias}(alias=${zkinfo.alias})}" th:text="${zkinfo.alias}"></a></li>
+    <li th:each="zkinfo:${zkinfos}" th:if="${zkinfo.connState != 'LOST'}"><a th:href="@{/zkinfo/{alias}(alias=${zkinfo.alias})}" th:text="${zkinfo.alias}"></a></li>
 </ul>
 <div th:fragment="script">
     <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>

@@ -29,6 +29,16 @@ public interface ZkInfoService {
      */
     void saveZkInfo(ZkInfo zkInfo);
 
+    /**
+     * 根据hosts更新zookeeper链接状态
+     *
+     * @param hosts
+     *         连接地址
+     * @param connState
+     *         连接状态
+     */
+    void updateZkInfoConnStateByHosts(String hosts, String connState);
+
 
     /**
      * 删除zkInfo
@@ -37,6 +47,14 @@ public interface ZkInfoService {
      *         别名
      */
     void deleteZkInfoByAlias(String alias);
+
+    /**
+     * 重连zookeeper
+     *
+     * @param alias
+     *         别名
+     */
+    void reconnectZk(String alias);
 
     /**
      * 获取zk指定路径下的子路径列表

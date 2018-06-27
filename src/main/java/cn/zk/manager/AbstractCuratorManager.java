@@ -1,6 +1,8 @@
 package cn.zk.manager;
 
 import cn.zk.app.config.CuratorManagerProperties;
+import cn.zk.common.AdminException;
+import cn.zk.common.RespCode;
 import cn.zk.manager.observer.ConnStateObserverDTO;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ public abstract class AbstractCuratorManager extends Observable implements Conne
     protected final CuratorFramework client;
 
     public AbstractCuratorManager(String zkHostPorts, CuratorManagerProperties properties) {
+        super();
         log.debug("zookeeper【{}】连接初始化...", zkHostPorts);
         RetryPolicy retryPolicy = new RetryNTimes(properties.getMaxRetries(), 6000);
         client = CuratorFrameworkFactory.builder().connectString(zkHostPorts).sessionTimeoutMs(properties.getSessionTimeoutMs())
@@ -42,6 +45,7 @@ public abstract class AbstractCuratorManager extends Observable implements Conne
 
     public void close() {
         ZooTrace.logTraceMessage(log, ZooTrace.getTextTraceLevel(), "关闭zookeeper连接...");
+        log.info("关闭zookeeper连接...");
         if (Objects.nonNull(client)) {
             client.close();
         }
@@ -50,9 +54,16 @@ public abstract class AbstractCuratorManager extends Observable implements Conne
 
     @Override
     public void stateChanged(CuratorFramework client, ConnectionState newState) {
+        setChanged();
         notifyObservers(new ConnStateObserverDTO(newState, client.getZookeeperClient().getCurrentConnectionString()));
         if (ConnectionState.LOST.equals(newState)) {
             close();
+        }
+    }
+
+    public void checkState() {
+        if (!client.getZookeeperClient().isConnected()) {
+            throw new AdminException(RespCode.ERROR_10005);
         }
     }
 
@@ -67,18 +78,21 @@ public abstract class AbstractCuratorManager extends Observable implements Conne
     @SneakyThrows
     public List<String> listChildrenPath(String parentPath) {
         log.debug("获取路径{}子路径名称列表", parentPath);
+        checkState();
         return client.getChildren().forPath(parentPath);
     }
 
     @SneakyThrows
     public void deletePath(String path, Integer version) {
         log.debug("删除路径{}, version={}", path, version);
+        checkState();
         client.delete().guaranteed().deletingChildrenIfNeeded().withVersion(version).forPath(path);
     }
 
     @SneakyThrows
     public String createPath(String path, String data, List<ACL> acls, int createMode) {
         log.debug("创建路径{}, data={}, createMode={}", path, data, createMode);
+        checkState();
         return client.create().creatingParentsIfNeeded().forPath(path, data.getBytes());
     }
 
@@ -93,18 +107,21 @@ public abstract class AbstractCuratorManager extends Observable implements Conne
     @SneakyThrows
     public boolean checkPathExist(String path) {
         log.debug("检查路径{}是否存在", path);
+        checkState();
         return Objects.nonNull(getPathStat(path));
     }
 
     @SneakyThrows
     public Stat getPathStat(String path) {
         log.debug("获取路径{}的元信息", path);
+        checkState();
         return client.checkExists().forPath(path);
     }
 
     @SneakyThrows
     public String getPathData(String path, Stat stat) {
         log.debug("获取路径{}的数据", path);
+        checkState();
         byte[] data = client.getData().storingStatIn(stat).forPath(path);
         return Objects.nonNull(data) ? new String(data) : "";
     }
@@ -112,6 +129,21 @@ public abstract class AbstractCuratorManager extends Observable implements Conne
     @SneakyThrows
     public Stat setPathData(String path, String data, Integer version) {
         log.debug("设置路径{}的数据", path);
+        checkState();
         return client.setData().withVersion(version).forPath(path, data.getBytes());
+    }
+
+    @SneakyThrows
+    public Stat setACLs(String path, List<ACL> acls, Integer version) {
+        log.debug("设置路径{}的ACL", path);
+        checkState();
+        return client.setACL().withACL(acls).forPath(path);
+    }
+
+    @SneakyThrows
+    public List<ACL> getACLs(String path) {
+        log.debug("获取路径{}的ACL", path);
+        checkState();
+        return client.getACL().forPath(path);
     }
 }

@@ -57,7 +57,6 @@ public class AdminServiceImpl implements AdminService {
         return userRepository.findAll(PageRequest.of(page - 1, pageSize));
     }
 
-    @Transactional(rollbackOn = {Exception.class})
     @Override
     public void saveOrUpdateUser(User user) {
         if (Objects.nonNull(user.getId())) {
@@ -73,6 +72,7 @@ public class AdminServiceImpl implements AdminService {
         return userRepository.findById(userId).orElseThrow(() -> new AdminException(RespCode.ERROR_10001));
     }
 
+    @Transactional(rollbackOn = {Exception.class})
     @Override
     public void deleteUserById(Integer userId) {
         if (userId == 1) {
