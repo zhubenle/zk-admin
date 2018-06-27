@@ -10,15 +10,4 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class AdminConfig {
-//
-//    @Bean
-//    public ResourceBundleMessageSource messageSource() {
-//        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-//        messageSource.setUseCodeAsDefaultMessage(true);
-//        messageSource.setFallbackToSystemLocale(false);
-//        messageSource.setBasenames("messages");
-//        messageSource.setDefaultEncoding("UTF-8");
-//        messageSource.setCacheSeconds(2);
-//        return messageSource;
-//    }
 }

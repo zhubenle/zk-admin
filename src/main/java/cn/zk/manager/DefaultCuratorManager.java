@@ -1,6 +1,6 @@
 package cn.zk.manager;
 
-import cn.zk.app.config.CuratorClientProperties;
+import cn.zk.app.config.CuratorManagerProperties;
 
 /**
  * <br/>
@@ -10,7 +10,7 @@ import cn.zk.app.config.CuratorClientProperties;
  */
 public class DefaultCuratorManager extends AbstractCuratorManager{
 
-    public DefaultCuratorManager(String zkHostPorts, CuratorClientProperties properties) {
+    public DefaultCuratorManager(String zkHostPorts, CuratorManagerProperties properties) {
         super(zkHostPorts, properties);
     }
 }

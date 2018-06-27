@@ -1,6 +1,7 @@
 package cn.zk.manager;
 
-import cn.zk.app.config.CuratorClientProperties;
+import cn.zk.app.config.CuratorManagerProperties;
+import cn.zk.manager.observer.ConnStateObserverDTO;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
@@ -8,13 +9,14 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.ZooTrace;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Observable;
 
 /**
  * <br/>
@@ -23,15 +25,15 @@ import java.util.Objects;
  * @author zhubenle
  */
 @Slf4j
-public abstract class AbstractCuratorManager implements ConnectionStateListener {
+public abstract class AbstractCuratorManager extends Observable implements ConnectionStateListener {
 
     protected final static String DEFAULT_CHARSET = "UTF-8";
 
     protected final CuratorFramework client;
 
-    public AbstractCuratorManager(String zkHostPorts, CuratorClientProperties properties) {
+    public AbstractCuratorManager(String zkHostPorts, CuratorManagerProperties properties) {
         log.debug("zookeeper【{}】连接初始化...", zkHostPorts);
-        RetryPolicy retryPolicy = new ExponentialBackoffRetry(properties.getBaseSleepTimeMs(), properties.getMaxRetries());
+        RetryPolicy retryPolicy = new RetryNTimes(properties.getMaxRetries(), 6000);
         client = CuratorFrameworkFactory.builder().connectString(zkHostPorts).sessionTimeoutMs(properties.getSessionTimeoutMs())
                 .connectionTimeoutMs(properties.getConnectionTimeoutMs()).retryPolicy(retryPolicy).build();
         client.getConnectionStateListenable().addListener(this);
@@ -43,11 +45,15 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
         if (Objects.nonNull(client)) {
             client.close();
         }
+        deleteObservers();
     }
 
     @Override
     public void stateChanged(CuratorFramework client, ConnectionState newState) {
-        log.warn("连接状态改变, 最新连接状态: {}", newState);
+        notifyObservers(new ConnStateObserverDTO(newState, client.getZookeeperClient().getCurrentConnectionString()));
+        if (ConnectionState.LOST.equals(newState)) {
+            close();
+        }
     }
 
     /**
@@ -73,7 +79,7 @@ public abstract class AbstractCuratorManager implements ConnectionStateListener 
     @SneakyThrows
     public String createPath(String path, String data, List<ACL> acls, int createMode) {
         log.debug("创建路径{}, data={}, createMode={}", path, data, createMode);
-        return  client.create().creatingParentsIfNeeded().forPath(path, data.getBytes());
+        return client.create().creatingParentsIfNeeded().forPath(path, data.getBytes());
     }
 
     /**

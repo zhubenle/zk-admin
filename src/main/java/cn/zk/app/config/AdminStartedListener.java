@@ -4,6 +4,7 @@ import cn.zk.entity.ZkInfo;
 import cn.zk.manager.AbstractCuratorManager;
 import cn.zk.manager.DefaultCuratorManager;
 import cn.zk.manager.factory.CuratorManagerFactory;
+import cn.zk.manager.observer.ConnStateObserver;
 import cn.zk.service.ZkInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +28,18 @@ import java.util.stream.Collectors;
 public class AdminStartedListener implements ApplicationListener<ApplicationStartedEvent> {
 
     private final ZkInfoService zkInfoService;
-    private final CuratorClientProperties curatorClientProperties;
+    private final CuratorManagerProperties curatorClientProperties;
     private final CuratorManagerFactory curatorManagerFactory;
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         Map<String, AbstractCuratorManager> managerMap = zkInfoService.listAll()
                 .stream()
-                .collect(Collectors.toMap(ZkInfo::getAlias, o -> new DefaultCuratorManager(o.getHosts(), curatorClientProperties)));
+                .collect(Collectors.toMap(ZkInfo::getAlias, o -> {
+                    DefaultCuratorManager curatorManager = new DefaultCuratorManager(o.getHosts(), curatorClientProperties);
+                    curatorManager.addObserver(new ConnStateObserver(zkInfoService));
+                    return curatorManager;
+                }));
         if (!managerMap.isEmpty()) {
             log.info("启动加载{} zookeeper管理端", managerMap.keySet().toString());
             curatorManagerFactory.setManagerMap(managerMap);

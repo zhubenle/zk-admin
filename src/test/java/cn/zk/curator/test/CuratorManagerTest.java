@@ -1,6 +1,6 @@
 package cn.zk.curator.test;
 
-import cn.zk.app.config.CuratorClientProperties;
+import cn.zk.app.config.CuratorManagerProperties;
 import cn.zk.manager.DefaultCuratorManager;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ public class CuratorManagerTest {
 
     @Test
     public void testGetPath() {
-        CuratorClientProperties clientProperties = new CuratorClientProperties();
+        CuratorManagerProperties clientProperties = new CuratorManagerProperties();
         clientProperties.setBaseSleepTimeMs(60000);
         clientProperties.setConnectionTimeoutMs(60000);
         clientProperties.setMaxRetries(3);

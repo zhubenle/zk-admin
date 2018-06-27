@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "curator.client")
-public class CuratorClientProperties {
+public class CuratorManagerProperties {
 
     private Integer baseSleepTimeMs;
     private Integer maxRetries;
