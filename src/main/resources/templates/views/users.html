@@ -117,6 +117,7 @@
                         modalUseId.val(data.data.id);
                         modalInputUsername.val(data.data.username);
                         modalInputEmail.val(data.data.email);
+                        modalInputPassword.val(data.data.password);
                     } else {
                         toastr["error"](data.msg);
                     }
@@ -175,7 +176,7 @@
     });
 
     addUserModal.on("hidden.bs.modal", function () {
-        formUser.find("div .form-group").removeClass("has-error");
+        formUser.find(".form-group").removeClass("has-error");
         formUser.find("input").val("");
     });
 

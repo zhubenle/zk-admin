@@ -48,11 +48,11 @@ public class ZkInfoServiceImpl implements ZkInfoService {
 
     @Override
     public void saveZkInfo(ZkInfo zkInfo) {
-        zkInfoRepository.save(zkInfo);
-
         DefaultCuratorManager curatorManager = new DefaultCuratorManager(zkInfo.getHosts(), curatorClientProperties);
         curatorManager.addObserver(new ConnStateObserver(this));
         curatorManagerFactory.getManagerMap().put(zkInfo.getAlias(), curatorManager);
+
+        zkInfoRepository.save(zkInfo);
     }
 
     @Override

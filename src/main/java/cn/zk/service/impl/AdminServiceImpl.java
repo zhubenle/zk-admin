@@ -9,7 +9,6 @@ import cn.zk.util.DateUtils;
 import cn.zk.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +41,7 @@ public class AdminServiceImpl implements AdminService {
             log.warn("{}登录失败, 用户不存在", user.getUsername());
             return Optional.empty();
         }
-        if (!DigestUtils.sha1Hex(user.getPassword()).equals(result.getPassword())) {
+        if (!user.getPassword().equals(result.getPassword())) {
             log.warn("{}登录失败, 密码错误", user.getUsername());
             return Optional.empty();
         }
