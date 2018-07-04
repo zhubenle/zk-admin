@@ -96,12 +96,12 @@ public class ZkInfoController {
     public Resp<String> ajaxReconnectZk(@PathVariable(value = "alias") String alias) {
         Resp<String> resp = new Resp<>();
         try {
-
+            zkInfoService.reconnectZk(alias);
         } catch (AdminException e) {
-            log.error("获取alias={}失败: {}", alias, e.getCodeMsg());
+            log.error("重连alias={}zookeeper失败: {}", alias, e.getCodeMsg());
             resp.fail(e);
         } catch (Exception e) {
-            log.error("获取alias={}异常", alias, e);
+            log.error("重连alias={}zookeeper异常", alias, e);
             resp.fail(RespCode.ERROR_99999, e);
         }
         return resp;

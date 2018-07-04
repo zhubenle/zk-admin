@@ -1,6 +1,8 @@
 package cn.zk.manager.observer;
 
 import cn.zk.service.ZkInfoService;
+import cn.zk.websocket.ZkStateMessageHandler;
+import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,11 +20,13 @@ import java.util.Observer;
 public class ConnStateObserver implements Observer {
 
     private final ZkInfoService zkInfoService;
+    private final ZkStateMessageHandler zkStateMessageHandler;
 
     @Override
     public void update(Observable o, Object arg) {
         ConnStateObserverDTO dto = (ConnStateObserverDTO) arg;
         log.warn("连接状态改变, 最新连接状态: {}", dto.getConnState());
         zkInfoService.updateZkInfoConnStateByHosts(dto.getConnStr(), dto.getConnState().toString());
+        zkStateMessageHandler.sendMessage(JSONObject.toJSONString(dto));
     }
 }

@@ -30,7 +30,7 @@ public class ZkStateMessageHandler extends AbstractWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-
+        log.info("Ws接受消息:{}", message.getPayload());
     }
 
     @Override

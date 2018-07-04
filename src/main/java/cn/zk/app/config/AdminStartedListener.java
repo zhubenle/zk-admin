@@ -6,6 +6,7 @@ import cn.zk.manager.DefaultCuratorManager;
 import cn.zk.manager.factory.CuratorManagerFactory;
 import cn.zk.manager.observer.ConnStateObserver;
 import cn.zk.service.ZkInfoService;
+import cn.zk.websocket.ZkStateMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class AdminStartedListener implements ApplicationListener<ApplicationStar
     private final ZkInfoService zkInfoService;
     private final CuratorManagerProperties curatorClientProperties;
     private final CuratorManagerFactory curatorManagerFactory;
+    private final ZkStateMessageHandler zkStateMessageHandler;
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
@@ -37,7 +39,7 @@ public class AdminStartedListener implements ApplicationListener<ApplicationStar
                 .stream()
                 .collect(Collectors.toMap(ZkInfo::getAlias, o -> {
                     DefaultCuratorManager curatorManager = new DefaultCuratorManager(o.getHosts(), curatorClientProperties);
-                    curatorManager.addObserver(new ConnStateObserver(zkInfoService));
+                    curatorManager.addObserver(new ConnStateObserver(zkInfoService, zkStateMessageHandler));
                     return curatorManager;
                 }));
         if (!managerMap.isEmpty()) {

@@ -21,6 +21,7 @@ public interface ZkInfoRepository extends JpaRepository<ZkInfo, Integer> {
      * @param alias
      *         别名
      */
+    @Transactional(rollbackOn = Exception.class)
     void deleteZkInfoByAliasEquals(String alias);
 
     /**

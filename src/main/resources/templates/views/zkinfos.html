@@ -186,6 +186,24 @@
             formZk.submit();
         }
     });
+    $(function () {
+        var ws = new WebSocket("ws://" + window.location.host + contextPath + "zk/state");
+        ws.onopen = function (ev) {
+            ws.send("我是客户端");
+        };
+        ws.onmessage = function (ev) {
+            var dataJson = JSON.parse(ev.data);
+            var message = "连接: " + dataJson.connStr + "状态变化为: " + dataJson.connState;
+            if("SUSPENDED" === dataJson.connState){
+                toastr.warning(message);
+            }else if ("LOST" === dataJson.connState) {
+                toastr.error(message);
+            } else {
+                toastr.info(message);
+            }
+
+        };
+    });
 </script>
 </body>
 </html>
