@@ -403,7 +403,7 @@
         modalPathEdit.find("#modal_path_edit_title").html("修改节点");
         modalEditPathName.val(nodes[0].name);
         var selected;
-        if ($("#ephemeralOwner").val() === "0") {
+        if ($("#ephemeralOwner").html() === "0") {
             selected = "0";
         } else {
             selected = "1";
@@ -454,7 +454,6 @@
                 success: function (data) {
                     if (10000 === data.code) {
                         var node = nodes[0].getParentNode();
-                        zTree.selectNode(node);
                         zTree.reAsyncChildNodes(node, "refresh", true);
                         swal("修改成功", "节点" + data.data + "修改成功", "success");
                     } else {
