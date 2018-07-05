@@ -17,13 +17,13 @@ public class PathDataVO {
 
     private Long czxId;
     private Long mzxId;
-    private Long cTime;
-    private String cTimeStr;
-    private Long mTime;
-    private String mTimeStr;
+    private Long ctime;
+    private String ctimeStr;
+    private Long mtime;
+    private String mtimeStr;
     private Integer version;
-    private Integer cVersion;
-    private Integer aVersion;
+    private Integer cversion;
+    private Integer aversion;
     private Long ephemeralOwner;
     private Integer dataLength;
     private Integer numChildren;
@@ -34,19 +34,19 @@ public class PathDataVO {
     public PathDataVO(Stat stat, String data) {
         this.czxId = stat.getCzxid();
         this.mzxId = stat.getMzxid();
-        this.cTime = stat.getCtime();
-        this.cTimeStr = "";
-        if (cTime != 0) {
-            this.cTimeStr = DateUtils.format(new Date(cTime), DateUtils.DATETIME_MS_FORMATTER1.get());
+        this.ctime = stat.getCtime();
+        this.ctimeStr = "";
+        if (ctime != 0) {
+            this.ctimeStr = DateUtils.format(new Date(ctime), DateUtils.DATETIME_MS_FORMATTER1.get());
         }
-        this.mTime = stat.getMtime();
-        this.mTimeStr = "";
-        if (mTime != 0) {
-            this.mTimeStr = DateUtils.format(new Date(mTime), DateUtils.DATETIME_MS_FORMATTER1.get());
+        this.mtime = stat.getMtime();
+        this.mtimeStr = "";
+        if (mtime != 0) {
+            this.mtimeStr = DateUtils.format(new Date(mtime), DateUtils.DATETIME_MS_FORMATTER1.get());
         }
         this.version = stat.getVersion();
-        this.cVersion = stat.getCversion();
-        this.aVersion = stat.getAversion();
+        this.cversion = stat.getCversion();
+        this.aversion = stat.getAversion();
         this.ephemeralOwner = stat.getEphemeralOwner();
         this.dataLength = stat.getDataLength();
         this.numChildren = stat.getNumChildren();
