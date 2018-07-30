@@ -201,6 +201,7 @@
             type: "GET",
             dataType: "json",
             dataFilter: function (treeId, parentNode, responseData) {
+
                 if (10000 === responseData.code) {
                     return responseData.data;
                 } else {
@@ -247,15 +248,74 @@
                         }
                     });
                 }
+            },
+            onExpand: function (event, treeId, treeNode) {
+
             }
         }
     };
+
     $(document).ready(function () {
         $("#modal_select_createMode").select2();
         $.fn.zTree.init($("#ztree"), setting);
 
+        context.init({
+            fadeSpeed: 100,
+            filter: function ($obj) {
+                console.log('context-filter' + $obj)
+            },
+            above: 'auto',
+            preventDoubleContext: true,
+            compress: false
+        });
+        var selectNode;
+        var rightMenu = [{
+            text: "复制节点",
+            action: function (e) {
+                var zTree = $.fn.zTree.getZTreeObj("ztree");
+                var nodes = zTree.getSelectedNodes();
+                if (nodes.length === 0) {
+                    swal("选择一个节点", "你必须选择一个节点, 再右键复制", "error");
+                    return;
+                }
+                selectNode = nodes[0];
+            }
+        }, {
+            text: "粘贴节点",
+            action: function (e) {
+                var zTree = $.fn.zTree.getZTreeObj("ztree");
+                var nodes = zTree.getSelectedNodes();
+                if (!selectNode) {
+                    swal("先复制节点", "你必须复制一个节点, 再粘贴节点", "error");
+                    return;
+                }
+                if (nodes.length === 0) {
+                    swal("选择一个节点", "你必须选择一个节点, 再粘贴节点", "error");
+                    return;
+                }
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: contextPath + "/path/" + alias + "/copy/paste?copy=" + selectNode.id + "&paste=" + nodes[0].id,
+                    success: function (data) {
+                        if (10000 === data.code) {
+                            zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+                            zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                        } else {
+                            swal("复制粘贴节点失败", data.msg, "error");
+                        }
+                    },
+                    error: function (status, errorThrown) {
+                        cleanTable();
+                        swal("复制粘贴节点失败", status.statusText + " " + errorThrown.toString(), "error");
+                    }
+                });
+            }
+        }];
+        context.attach("#ztree", rightMenu);
+
         var ckeditor_config = {
-            toolbar : [],
+            toolbar: [],
             height: 300,
             startupMode: "source",
             removePlugins: "elementspath"
@@ -288,6 +348,7 @@
             return;
         }
         zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+        zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
         swal("刷新成功", "节点" + nodes[0].name + "刷新成功", "success");
     });
 
@@ -365,7 +426,7 @@
                 type: "POST",
                 dataType: "json",
                 url: contextPath + "/path/add/" + alias,
-                data: "createMode=" + modalCreateMode.val() + "&data=" +  CKEDITOR.instances.modal_input_data.getData() + "&pathId=" + pathId,
+                data: "createMode=" + modalCreateMode.val() + "&data=" + CKEDITOR.instances.modal_input_data.getData() + "&pathId=" + pathId,
                 success: function (data) {
                     if (10000 === data.code) {
                         var node = nodes[0].isParent ? nodes[0] : nodes[0].getParentNode();

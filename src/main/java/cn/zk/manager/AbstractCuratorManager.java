@@ -119,6 +119,14 @@ public abstract class AbstractCuratorManager extends Observable implements Conne
     }
 
     @SneakyThrows
+    public String getPathData(String path) {
+        log.debug("获取路径{}的数据", path);
+        checkState();
+        byte[] data = client.getData().forPath(path);
+        return Objects.nonNull(data) ? new String(data) : "";
+    }
+
+    @SneakyThrows
     public String getPathData(String path, Stat stat) {
         log.debug("获取路径{}的数据", path);
         checkState();

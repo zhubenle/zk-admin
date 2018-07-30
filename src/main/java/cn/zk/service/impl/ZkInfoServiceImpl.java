@@ -15,6 +15,7 @@ import cn.zk.service.ZkInfoService;
 import cn.zk.websocket.ZkStateMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -155,5 +156,29 @@ public class ZkInfoServiceImpl implements ZkInfoService {
         Stat stat = new Stat();
         String result = curatorManager.getPathData(pathId, stat);
         return new PathDataVO(stat, result);
+    }
+
+    @Override
+    public void copyPastePath(String alias, String copy, String paste) {
+        DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
+                .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
+        if (SEPARATOR.equals(copy)) {
+            throw new AdminException(RespCode.ERROR_10007);
+        }
+        if (!SEPARATOR.equals(paste)) {
+            paste = paste + SEPARATOR;
+        }
+        log.info("alias={}, copy={}, paste={}", alias, copy, paste);
+        copyPaste(copy, paste, curatorManager);
+    }
+
+    private void copyPaste(String copy, String paste, DefaultCuratorManager curatorManager) {
+        paste = paste + copy.substring(copy.lastIndexOf(SEPARATOR) + 1);
+        curatorManager.createPath(paste, curatorManager.getPathData(copy), null, CreateMode.PERSISTENT.toFlag());
+        String finalPaste = paste;
+        curatorManager.listChildrenPath(copy).forEach(s -> {
+            String pasteTemp = finalPaste + SEPARATOR + s;
+            copyPaste(copy + SEPARATOR + s, pasteTemp, curatorManager);
+        });
     }
 }

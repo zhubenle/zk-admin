@@ -22,6 +22,12 @@ public class Resp<T> {
         this.data = data;
     }
 
+    public void success() {
+        this.code = RespCode.SUCCESS.getCode();
+        this.msg = RespCode.SUCCESS.getMsg();
+        time = DateUtils.getCurrentDateTimeStr();
+    }
+
     public void fail(RespCode respCode) {
         this.code = respCode.getCode();
         this.msg = respCode.getMsg();

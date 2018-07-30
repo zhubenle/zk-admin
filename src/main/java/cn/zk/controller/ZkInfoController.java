@@ -113,7 +113,7 @@ public class ZkInfoController {
     @GetMapping(value = "/path/{alias}")
     @ResponseBody
     public Resp<List<PathVO>> ajaxGetPath(@PathVariable(value = "alias") String alias,
-                                      @RequestParam(value = "id", required = false, defaultValue = "") String id) {
+                                          @RequestParam(value = "id", required = false, defaultValue = "") String id) {
         Resp<List<PathVO>> userResp = new Resp<>();
         try {
             userResp.success(zkInfoService.listZkChildrenPath(alias, id));
@@ -133,8 +133,8 @@ public class ZkInfoController {
     @DeleteMapping(value = "/path/{alias}")
     @ResponseBody
     public Resp<String> ajaxDeletePath(@PathVariable(value = "alias") String alias,
-                                   @RequestParam(value = "dataVersion") Integer dataVersion,
-                                   @RequestParam(value = "pathId") String pathId) {
+                                       @RequestParam(value = "dataVersion") Integer dataVersion,
+                                       @RequestParam(value = "pathId") String pathId) {
         Resp<String> userResp = new Resp<>();
         try {
             zkInfoService.deletePath(alias, pathId, dataVersion);
@@ -155,9 +155,9 @@ public class ZkInfoController {
     @PostMapping(value = "/path/add/{alias}")
     @ResponseBody
     public Resp<String> ajaxCreatePath(@PathVariable(value = "alias") String alias,
-                                   @RequestParam(value = "pathId") String pathId,
-                                   @RequestParam(value = "data", required = false) String data,
-                                   @RequestParam(value = "createMode", required = false, defaultValue = "0") Integer createMode) {
+                                       @RequestParam(value = "pathId") String pathId,
+                                       @RequestParam(value = "data", required = false) String data,
+                                       @RequestParam(value = "createMode", required = false, defaultValue = "0") Integer createMode) {
         Resp<String> userResp = new Resp<>();
         try {
             userResp.success(zkInfoService.createPath(alias, pathId, data, createMode));
@@ -177,11 +177,11 @@ public class ZkInfoController {
     @PostMapping(value = "/path/edit/{alias}")
     @ResponseBody
     public Resp<String> ajaxEditPath(@PathVariable(value = "alias") String alias,
-                                   @RequestParam(value = "newPathId") String newPathId,
-                                   @RequestParam(value = "oldPathId") String oldPathId,
-                                   @RequestParam(value = "dataVersion") Integer dataVersion,
-                                   @RequestParam(value = "data", required = false) String data,
-                                   @RequestParam(value = "createMode") Integer createMode) {
+                                     @RequestParam(value = "newPathId") String newPathId,
+                                     @RequestParam(value = "oldPathId") String oldPathId,
+                                     @RequestParam(value = "dataVersion") Integer dataVersion,
+                                     @RequestParam(value = "data", required = false) String data,
+                                     @RequestParam(value = "createMode") Integer createMode) {
         Resp<String> userResp = new Resp<>();
         try {
             userResp.success(zkInfoService.updatePath(alias, newPathId, oldPathId, data, dataVersion, createMode));
@@ -201,7 +201,7 @@ public class ZkInfoController {
     @GetMapping(value = "/path/data/{alias}")
     @ResponseBody
     public Resp<PathDataVO> ajaxGetPathData(@PathVariable(value = "alias") String alias,
-                                        @RequestParam(value = "pathId", required = false, defaultValue = "") String pathId) {
+                                            @RequestParam(value = "pathId", required = false, defaultValue = "") String pathId) {
         Resp<PathDataVO> userResp = new Resp<>();
         try {
             userResp.success(StringUtils.isEmpty(pathId) ? null : zkInfoService.getPathData(alias, pathId));
@@ -210,6 +210,28 @@ public class ZkInfoController {
             userResp.fail(e);
         } catch (Exception e) {
             log.error("获取alias={}, path={}数据异常", alias, pathId, e);
+            userResp.fail(RespCode.ERROR_99999, e);
+        }
+        return userResp;
+    }
+
+    /**
+     * 复制一个节点所有信息粘贴到另一个节点下
+     */
+    @GetMapping(value = "/path/{alias}/copy/paste")
+    @ResponseBody
+    public Resp<PathDataVO> copyPastePath(@PathVariable(value = "alias") String alias,
+                                          @RequestParam(value = "copy") String copy,
+                                          @RequestParam(value = "paste") String paste) {
+        Resp<PathDataVO> userResp = new Resp<>();
+        try {
+            zkInfoService.copyPastePath(alias, copy, paste);
+            userResp.success();
+        } catch (AdminException e) {
+            log.error("复制alias={}, path={}到path={}下失败: {}", alias, copy, paste, e.getCodeMsg());
+            userResp.fail(e);
+        } catch (Exception e) {
+            log.error("复制alias={}, path={}到path={}下异常", alias, copy, paste, e);
             userResp.fail(RespCode.ERROR_99999, e);
         }
         return userResp;

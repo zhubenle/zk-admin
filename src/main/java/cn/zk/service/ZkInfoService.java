@@ -127,4 +127,16 @@ public interface ZkInfoService {
      * @return 路径数据
      */
     PathDataVO getPathData(String alias, String pathId);
+
+    /**
+     * 复制指定节点粘贴到指定节点下
+     *
+     * @param alias
+     *         别名
+     * @param copy
+     *         复制的节点
+     * @param paste
+     *         复制粘贴到的节点
+     */
+    void copyPastePath(String alias, String copy, String paste);
 }
