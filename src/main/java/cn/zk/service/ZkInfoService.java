@@ -137,6 +137,8 @@ public interface ZkInfoService {
      *         复制的节点
      * @param paste
      *         复制粘贴到的节点
+     * @param newBasePaste
+     *         粘贴后的新名称
      */
-    void copyPastePath(String alias, String copy, String paste);
+    void copyPastePath(String alias, String copy, String paste, String newBasePaste);
 }

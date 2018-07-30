@@ -12,6 +12,7 @@ import cn.zk.manager.factory.CuratorManagerFactory;
 import cn.zk.manager.observer.ConnStateObserver;
 import cn.zk.repository.ZkInfoRepository;
 import cn.zk.service.ZkInfoService;
+import cn.zk.util.StringUtils;
 import cn.zk.websocket.ZkStateMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,11 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -78,10 +79,12 @@ public class ZkInfoServiceImpl implements ZkInfoService {
         if (StringUtils.isEmpty(alias)) {
             throw new AdminException(RespCode.ERROR_10004);
         }
-        AbstractCuratorManager abstractCuratorManager = null;
-        if (Objects.nonNull(abstractCuratorManager = curatorManagerFactory.getManagerMap().get(alias))) {
+        Optional<AbstractCuratorManager> abstractCuratorManager = curatorManagerFactory.getManager(alias);
+        if (abstractCuratorManager.isPresent() && abstractCuratorManager.get().isConnected()) {
             throw new AdminException(RespCode.ERROR_10006);
         }
+        curatorManagerFactory.removeManager(alias);
+
         ZkInfo zkInfo = zkInfoRepository.getZkInfoByAliasEquals(alias);
         DefaultCuratorManager curatorManager = new DefaultCuratorManager(zkInfo.getHosts(), curatorClientProperties);
         curatorManager.addObserver(new ConnStateObserver(this, zkStateMessageHandler));
@@ -159,7 +162,7 @@ public class ZkInfoServiceImpl implements ZkInfoService {
     }
 
     @Override
-    public void copyPastePath(String alias, String copy, String paste) {
+    public void copyPastePath(String alias, String copy, String paste, String newBasePaste) {
         DefaultCuratorManager curatorManager = (DefaultCuratorManager) curatorManagerFactory.getManager(alias)
                 .orElseThrow(() -> new AdminException(RespCode.ERROR_10003));
         if (SEPARATOR.equals(copy)) {
@@ -169,16 +172,17 @@ public class ZkInfoServiceImpl implements ZkInfoService {
             paste = paste + SEPARATOR;
         }
         log.info("alias={}, copy={}, paste={}", alias, copy, paste);
+        paste = paste + (StringUtils.isEmpty(newBasePaste) ? copy.substring(copy.lastIndexOf(SEPARATOR) + 1) : newBasePaste);
+        if (curatorManager.checkPathExist(paste)) {
+            throw new AdminException(RespCode.ERROR_10008);
+        }
         copyPaste(copy, paste, curatorManager);
     }
 
     private void copyPaste(String copy, String paste, DefaultCuratorManager curatorManager) {
-        paste = paste + copy.substring(copy.lastIndexOf(SEPARATOR) + 1);
         curatorManager.createPath(paste, curatorManager.getPathData(copy), null, CreateMode.PERSISTENT.toFlag());
-        String finalPaste = paste;
         curatorManager.listChildrenPath(copy).forEach(s -> {
-            String pasteTemp = finalPaste + SEPARATOR + s;
-            copyPaste(copy + SEPARATOR + s, pasteTemp, curatorManager);
+            copyPaste(copy + SEPARATOR + s, paste + SEPARATOR + s, curatorManager);
         });
     }
 }

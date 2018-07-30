@@ -24,7 +24,10 @@ public class ConnStateObserver implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        ConnStateObserverDTO dto = (ConnStateObserverDTO) arg;
+        ObserverDTO dto = (ObserverDTO) arg;
+        if (!dto.getType().equals(ObserverDTO.Type.CONN_STATE)) {
+            return;
+        }
         log.warn("连接状态改变, 最新连接状态: {}", dto.getConnState());
         zkInfoService.updateZkInfoConnStateByHosts(dto.getConnStr(), dto.getConnState().toString());
         zkStateMessageHandler.sendMessage(JSONObject.toJSONString(dto));

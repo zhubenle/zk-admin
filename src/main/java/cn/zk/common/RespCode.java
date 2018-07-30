@@ -18,6 +18,7 @@ public enum RespCode {
     ERROR_10005(10005, "zookeeper未连接"),
     ERROR_10006(10006, "zookeeper已连接"),
     ERROR_10007(10007, "根目录不支持操作"),
+    ERROR_10008(10008, "目录已经存在"),
 
     ERROR_99999(99999, "系统异常")
     ;

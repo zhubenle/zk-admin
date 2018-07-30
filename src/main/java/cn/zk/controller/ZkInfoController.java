@@ -98,10 +98,10 @@ public class ZkInfoController {
         try {
             zkInfoService.reconnectZk(alias);
         } catch (AdminException e) {
-            log.error("重连alias={}zookeeper失败: {}", alias, e.getCodeMsg());
+            log.error("重连alias={} zookeeper失败: {}", alias, e.getCodeMsg());
             resp.fail(e);
         } catch (Exception e) {
-            log.error("重连alias={}zookeeper异常", alias, e);
+            log.error("重连alias={} zookeeper异常", alias, e);
             resp.fail(RespCode.ERROR_99999, e);
         }
         return resp;
@@ -222,10 +222,11 @@ public class ZkInfoController {
     @ResponseBody
     public Resp<PathDataVO> copyPastePath(@PathVariable(value = "alias") String alias,
                                           @RequestParam(value = "copy") String copy,
-                                          @RequestParam(value = "paste") String paste) {
+                                          @RequestParam(value = "paste") String paste,
+                                          @RequestParam(value = "nPaste", required = false) String nPaste) {
         Resp<PathDataVO> userResp = new Resp<>();
         try {
-            zkInfoService.copyPastePath(alias, copy, paste);
+            zkInfoService.copyPastePath(alias, copy, paste, nPaste);
             userResp.success();
         } catch (AdminException e) {
             log.error("复制alias={}, path={}到path={}下失败: {}", alias, copy, paste, e.getCodeMsg());

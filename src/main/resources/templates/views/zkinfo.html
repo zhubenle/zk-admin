@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="base::common_head(~{::title},~{::style})">
-    <title>zookeeper管理</title>
+    <title>zookeeper节点管理</title>
     <style>
         .table > tbody > tr > td {
             padding-top: 0;
@@ -25,8 +25,6 @@
                 <div class="col-md-4">
                     <button class="btn btn-primary" id="btn_add">添加</button> &nbsp;
                     <button class="btn btn-primary" id="btn_edit">修改</button> &nbsp;
-                    <button class="btn btn-info" id="btn_refresh">刷新</button> &nbsp;
-                    <button class="btn btn-danger" id="btn_delete">删除</button>
                 </div>
             </div>
             <hr>
@@ -262,7 +260,6 @@
         context.init({
             fadeSpeed: 100,
             filter: function ($obj) {
-                console.log('context-filter' + $obj)
             },
             above: 'auto',
             preventDoubleContext: true,
@@ -301,6 +298,45 @@
                         if (10000 === data.code) {
                             zTree.reAsyncChildNodes(nodes[0], "refresh", true);
                             zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                        } else if (10008 === data.code) {
+                            swal(selectNode.name + "已存在,输入粘贴后新节点名称:", {
+                                buttons: {
+                                    cancel: {
+                                        text: "Cancel",
+                                        value: false,
+                                        visible: true,
+                                        closeModal: true
+                                    },
+                                    confirm: {
+                                        text: "OK",
+                                        value: true,
+                                        closeModal: true
+                                    }
+                                },
+                                content: "input"
+                            }).then(function (value) {
+                                console.log("--------" + value);
+                                if (!value) {
+                                    return;
+                                }
+                                $.ajax({
+                                    type: "GET",
+                                    dataType: "json",
+                                    url: contextPath + "/path/" + alias + "/copy/paste?copy=" + selectNode.id + "&paste=" + nodes[0].id + "&nPaste=" + value,
+                                    success: function (data) {
+                                        if (10000 === data.code) {
+                                            zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+                                            zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                                        } else {
+                                            swal("复制粘贴节点失败", data.msg, "error");
+                                        }
+                                    },
+                                    error: function (status, errorThrown) {
+                                        cleanTable();
+                                        swal("复制粘贴节点失败", status.statusText + " " + errorThrown.toString(), "error");
+                                    }
+                                });
+                            });
                         } else {
                             swal("复制粘贴节点失败", data.msg, "error");
                         }
@@ -308,6 +344,56 @@
                     error: function (status, errorThrown) {
                         cleanTable();
                         swal("复制粘贴节点失败", status.statusText + " " + errorThrown.toString(), "error");
+                    }
+                });
+            }
+        },{
+            text: "刷新节点",
+            action: function (e) {
+                var zTree = $.fn.zTree.getZTreeObj("ztree");
+                var nodes = zTree.getSelectedNodes();
+                if (nodes.length === 0) {
+                    swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
+                    return;
+                }
+                zTree.reAsyncChildNodes(nodes[0], "refresh", true);
+                zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                swal("刷新成功", "节点" + nodes[0].name + "刷新成功", "success");
+            }
+        },{
+            text: "删除节点",
+            action: function (e) {
+                var zTree = $.fn.zTree.getZTreeObj("ztree");
+                var nodes = zTree.getSelectedNodes();
+                if (nodes.length === 0) {
+                    swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
+                    return;
+                }
+                swal({
+                    title: "你正在执行删除操作",
+                    text:  nodes[0].id + "删除之后，该数据将无法再恢复!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then(function (willDelete) {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "DELETE",
+                            dataType: "json",
+                            url: contextPath + "/path/" + alias + "?dataVersion=" + $("#dataVersion").html() + "&pathId=" + nodes[0].id,
+                            success: function (data) {
+                                if (10000 === data.code) {
+                                    zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                                    swal("删除成功", "节点" + nodes[0].id + "删除成功", "success");
+                                } else {
+                                    swal("删除节点失败", data.msg, "error");
+                                }
+                            },
+                            error: function (status, errorThrown) {
+                                swal("删除节点失败", status.statusText + " " + errorThrown.toString(), "error");
+                                cleanTable();
+                            }
+                        });
                     }
                 });
             }
@@ -339,53 +425,6 @@
         $("#path_data").html("");
         $("#currentPath").html("");
     }
-
-    $("#btn_refresh").on("click", function () {
-        var zTree = $.fn.zTree.getZTreeObj("ztree");
-        var nodes = zTree.getSelectedNodes();
-        if (nodes.length === 0) {
-            swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
-            return;
-        }
-        zTree.reAsyncChildNodes(nodes[0], "refresh", true);
-        zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
-        swal("刷新成功", "节点" + nodes[0].name + "刷新成功", "success");
-    });
-
-    $("#btn_delete").on("click", function () {
-        var zTree = $.fn.zTree.getZTreeObj("ztree");
-        var nodes = zTree.getSelectedNodes();
-        if (nodes.length === 0) {
-            swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
-            return;
-        }
-        swal({
-            title: "你正在执行删除操作",
-            text: "删除之后，该数据将无法再恢复!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    type: "DELETE",
-                    dataType: "json",
-                    url: contextPath + "/path/" + alias + "?dataVersion=" + $("#dataVersion").html() + "&pathId=" + nodes[0].id,
-                    success: function (data) {
-                        if (10000 === data.code) {
-                            zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
-                            swal("删除成功", "节点" + nodes[0].id + "删除成功", "success");
-                        } else {
-                            swal("删除节点失败", data.msg, "error");
-                        }
-                    },
-                    error: function (status, errorThrown) {
-                        swal("删除节点失败", status.statusText + " " + errorThrown.toString(), "error");
-                    }
-                });
-            }
-        });
-    });
 
     //------add path
     var modalPath = $("#modal_path");
@@ -438,6 +477,7 @@
                 },
                 error: function (status, errorThrown) {
                     swal("添加节点失败", status.statusText + " " + errorThrown.toString(), "error");
+                    cleanTable();
                 }
             });
         }
@@ -489,6 +529,7 @@
             },
             error: function (status, errorThrown) {
                 swal("修改节点失败", status.statusText + " " + errorThrown.toString(), "error");
+                cleanTable();
             }
         });
     });
@@ -523,9 +564,23 @@
                 },
                 error: function (status, errorThrown) {
                     swal("修改节点失败", status.statusText + " " + errorThrown.toString(), "error");
+                    cleanTable();
                 }
             });
         }
+    });
+    $(function () {
+        var ws = new WebSocket("ws://" + window.location.host + contextPath + "zk/child/event");
+        ws.onopen = function (ev) {
+        };
+        ws.onmessage = function (ev) {
+            var path = ev.data;
+            var message = "节点" + path + "发生变化, 已经刷新";
+            toastr.info(message);
+            var zTree = $.fn.zTree.getZTreeObj("ztree");
+            zTree.reAsyncChildNodes(zTree.getNodeByTId("/"), "refresh", true);
+            cleanTable();
+        };
     });
 </script>
 </body>

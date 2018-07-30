@@ -1,5 +1,6 @@
 package cn.zk.app.config;
 
+import cn.zk.websocket.ZkChildEventMessageHandler;
 import cn.zk.websocket.ZkStateMessageHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,12 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final ZkStateMessageHandler messageHandler;
+    private final ZkStateMessageHandler zkStateMessageHandler;
+    private final ZkChildEventMessageHandler zkChildEventMessageHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
-        webSocketHandlerRegistry.addHandler(messageHandler, "/zk/state");
+        webSocketHandlerRegistry.addHandler(zkStateMessageHandler, "/zk/state");
+        webSocketHandlerRegistry.addHandler(zkChildEventMessageHandler, "/zk/child/event");
     }
 }

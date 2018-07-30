@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="base::common_head(~{::title},~{})">
-    <title>zookeeper管理</title>
+    <title>zookeeper连接管理</title>
 </head>
 <body>
 <div th:replace="~{base::navbar}"></div>
@@ -39,7 +39,7 @@
                                   class="label label-success" th:text="${zkinfo.connState}"></span>
                             <span th:if="${zkinfo.connState=='READ_ONLY'}" class="label label-info" th:text="${zkinfo.connState}"></span>
                             <span th:if="${zkinfo.connState=='SUSPENDED'}" class="label label-warning" th:text="${zkinfo.connState}"></span>
-                            <span th:if="${zkinfo.connState=='LOST'}" class="llabel label-danger" th:text="${zkinfo.connState}"></span>
+                            <span th:if="${zkinfo.connState=='LOST'}" class="label label-danger" th:text="${zkinfo.connState}"></span>
                         </td>
                         <td th:text="${zkinfo.hosts}"></td>
                         <td th:text="${zkinfo.createTime}"></td>
@@ -189,19 +189,21 @@
     $(function () {
         var ws = new WebSocket("ws://" + window.location.host + contextPath + "zk/state");
         ws.onopen = function (ev) {
-            ws.send("我是客户端");
         };
         ws.onmessage = function (ev) {
             var dataJson = JSON.parse(ev.data);
             var message = "连接: " + dataJson.connStr + "状态变化为: " + dataJson.connState;
+            var type;
             if("SUSPENDED" === dataJson.connState){
-                toastr.warning(message);
+                type = "warning";
             }else if ("LOST" === dataJson.connState) {
-                toastr.error(message);
+                type = "error";
             } else {
-                toastr.info(message);
+                type = "info";
             }
-
+            swal("连接状态发生变化", message, type).then(function (value) {
+                window.location.reload();
+            });
         };
     });
 </script>

@@ -4,8 +4,10 @@ import cn.zk.entity.ZkInfo;
 import cn.zk.manager.AbstractCuratorManager;
 import cn.zk.manager.DefaultCuratorManager;
 import cn.zk.manager.factory.CuratorManagerFactory;
+import cn.zk.manager.observer.ChildEventObserver;
 import cn.zk.manager.observer.ConnStateObserver;
 import cn.zk.service.ZkInfoService;
+import cn.zk.websocket.ZkChildEventMessageHandler;
 import cn.zk.websocket.ZkStateMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ public class AdminStartedListener implements ApplicationListener<ApplicationStar
     private final CuratorManagerProperties curatorClientProperties;
     private final CuratorManagerFactory curatorManagerFactory;
     private final ZkStateMessageHandler zkStateMessageHandler;
+    private final ZkChildEventMessageHandler zkChildEventMessageHandler;
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
@@ -40,6 +43,7 @@ public class AdminStartedListener implements ApplicationListener<ApplicationStar
                 .collect(Collectors.toMap(ZkInfo::getAlias, o -> {
                     DefaultCuratorManager curatorManager = new DefaultCuratorManager(o.getHosts(), curatorClientProperties);
                     curatorManager.addObserver(new ConnStateObserver(zkInfoService, zkStateMessageHandler));
+                    curatorManager.addObserver(new ChildEventObserver(zkChildEventMessageHandler));
                     return curatorManager;
                 }));
         if (!managerMap.isEmpty()) {

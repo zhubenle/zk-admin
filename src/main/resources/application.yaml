@@ -40,4 +40,4 @@ curator:
 logging:
   level:
     cn.zk: info
-    org.apache.curator: debug
+    org.apache.curator: info
