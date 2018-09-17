@@ -10,6 +10,8 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 /**
  * <br/>
  * Created on 2018/6/11 16:46.
@@ -34,6 +36,9 @@ public class DefaultCuratorManager extends AbstractCuratorManager{
         if (TreeCacheEvent.Type.NODE_ADDED.equals(event.getType()) || TreeCacheEvent.Type.NODE_UPDATED.equals(event.getType())
                 || TreeCacheEvent.Type.NODE_REMOVED.equals(event.getType())) {
             ChildData childData = event.getData();
+            if (Objects.isNull(childData.getData())) {
+                return;
+            }
             String value = new String(childData.getData());
             String path = childData.getPath();
             setChanged();
