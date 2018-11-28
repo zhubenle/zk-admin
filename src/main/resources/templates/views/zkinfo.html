@@ -252,8 +252,8 @@
             }
         }
     };
-
-    $(document).ready(function () {
+    var isCurrentEdit = false;
+    $(function () {
         $("#modal_select_createMode").select2();
         $.fn.zTree.init($("#ztree"), setting);
 
@@ -290,6 +290,7 @@
                     swal("选择一个节点", "你必须选择一个节点, 再粘贴节点", "error");
                     return;
                 }
+                isCurrentEdit = true;
                 $.ajax({
                     type: "GET",
                     dataType: "json",
@@ -377,6 +378,7 @@
                     dangerMode: true
                 }).then(function (willDelete) {
                     if (willDelete) {
+                        isCurrentEdit = true;
                         $.ajax({
                             type: "DELETE",
                             dataType: "json",
@@ -458,6 +460,7 @@
         });
         if (submit) {
             modalPath.modal("hide");
+            isCurrentEdit = true;
             var zTree = $.fn.zTree.getZTreeObj("ztree");
             var nodes = zTree.getSelectedNodes();
             var pathId = nodes[0].id + (!nodes[0].getParentNode() ? "" : "/") + modalPathName.val();
@@ -515,6 +518,7 @@
             modalEditCreateMode.select2({"disabled": true});
         }
 
+        isCurrentEdit = true;
         $.ajax({
             type: "GET",
             dataType: "json",
@@ -542,6 +546,7 @@
             }
         });
         if (submit) {
+            isCurrentEdit = true;
             modalPathEdit.modal("hide");
             var zTree = $.fn.zTree.getZTreeObj("ztree");
             var nodes = zTree.getSelectedNodes();
@@ -569,19 +574,21 @@
             });
         }
     });
-    $(function () {
-        var ws = new WebSocket("ws://" + window.location.host + contextPath + "zk/child/event");
-        ws.onopen = function (ev) {
-        };
-        ws.onmessage = function (ev) {
-            var path = ev.data;
-            var message = "节点" + path + "发生变化, 已经刷新";
-            toastr.info(message);
-            var zTree = $.fn.zTree.getZTreeObj("ztree");
-            zTree.reAsyncChildNodes(zTree.getNodeByTId("/"), "refresh", true);
-            cleanTable();
-        };
-    });
+    var ws = new WebSocket("ws://" + window.location.host + contextPath + "zk/child/event");
+    ws.onopen = function (ev) {
+    };
+    ws.onmessage = function (ev) {
+        if (isCurrentEdit) {
+            isCurrentEdit = false;
+            return;
+        }
+        var path = ev.data;
+        var message = "节点" + path + "发生变化, 已经刷新";
+        toastr.info(message);
+        var zTree = $.fn.zTree.getZTreeObj("ztree");
+        zTree.reAsyncChildNodes(zTree.getNodeByTId("/"), "refresh", true);
+        cleanTable();
+    };
 </script>
 </body>
 </html>
