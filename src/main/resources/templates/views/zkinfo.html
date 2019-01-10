@@ -282,6 +282,10 @@
             action: function (e) {
                 var zTree = $.fn.zTree.getZTreeObj("ztree");
                 var nodes = zTree.getSelectedNodes();
+                var parentNode = nodes[0].getParentNode();
+                if (nodes[0].id === "/") {
+                    parentNode = nodes[0];
+                }
                 if (!selectNode) {
                     swal("先复制节点", "你必须复制一个节点, 再粘贴节点", "error");
                     return;
@@ -297,8 +301,7 @@
                     url: contextPath + "/path/" + alias + "/copy/paste?copy=" + selectNode.id + "&paste=" + nodes[0].id,
                     success: function (data) {
                         if (10000 === data.code) {
-                            zTree.reAsyncChildNodes(nodes[0], "refresh", true);
-                            zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                            zTree.reAsyncChildNodes(parentNode, "refresh", true);
                         } else if (10008 === data.code) {
                             swal(selectNode.name + "已存在,输入粘贴后新节点名称:", {
                                 buttons: {
@@ -326,8 +329,7 @@
                                     url: contextPath + "/path/" + alias + "/copy/paste?copy=" + selectNode.id + "&paste=" + nodes[0].id + "&nPaste=" + value,
                                     success: function (data) {
                                         if (10000 === data.code) {
-                                            zTree.reAsyncChildNodes(nodes[0], "refresh", true);
-                                            zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
+                                            zTree.reAsyncChildNodes(parentNode, "refresh", true);
                                         } else {
                                             swal("复制粘贴节点失败", data.msg, "error");
                                         }
@@ -348,31 +350,42 @@
                     }
                 });
             }
-        },{
+        }, {
             text: "刷新节点",
             action: function (e) {
                 var zTree = $.fn.zTree.getZTreeObj("ztree");
                 var nodes = zTree.getSelectedNodes();
+                var parentNode = nodes[0].getParentNode();
+                if (nodes[0].id === "/") {
+                    parentNode = nodes[0];
+                }
                 if (nodes.length === 0) {
                     swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
                     return;
                 }
-                zTree.reAsyncChildNodes(nodes[0], "refresh", true);
-                zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
-                swal("刷新成功", "节点" + nodes[0].name + "刷新成功", "success");
+                zTree.reAsyncChildNodes(parentNode, "refresh", true);
+                swal("刷新成功", "节点 " + nodes[0].name + " 刷新成功", "success");
             }
-        },{
+        }, {
             text: "删除节点",
             action: function (e) {
                 var zTree = $.fn.zTree.getZTreeObj("ztree");
                 var nodes = zTree.getSelectedNodes();
+                var parentNode = nodes[0].getParentNode();
+                if (nodes[0].id === "/") {
+                    swal("/删除节点失败", data.msg, "error");
+                    return;
+                }
+                if (parentNode.id !== "/") {
+                    parentNode = parentNode.getParentNode();
+                }
                 if (nodes.length === 0) {
                     swal("选择一个节点", "你必须选择一个节点, 再刷新", "error");
                     return;
                 }
                 swal({
                     title: "你正在执行删除操作",
-                    text:  nodes[0].id + "删除之后，该数据将无法再恢复!",
+                    text: nodes[0].id + "删除之后，该数据将无法再恢复!",
                     icon: "warning",
                     buttons: true,
                     dangerMode: true
@@ -385,8 +398,8 @@
                             url: contextPath + "/path/" + alias + "?dataVersion=" + $("#dataVersion").html() + "&pathId=" + nodes[0].id,
                             success: function (data) {
                                 if (10000 === data.code) {
-                                    zTree.reAsyncChildNodes(nodes[0].getParentNode(), "refresh", true);
-                                    swal("删除成功", "节点" + nodes[0].id + "删除成功", "success");
+                                    zTree.reAsyncChildNodes(parentNode, "refresh", true);
+                                    swal("删除成功", "节点 " + nodes[0].id + " 删除成功", "success");
                                 } else {
                                     swal("删除节点失败", data.msg, "error");
                                 }
@@ -463,7 +476,14 @@
             isCurrentEdit = true;
             var zTree = $.fn.zTree.getZTreeObj("ztree");
             var nodes = zTree.getSelectedNodes();
-            var pathId = nodes[0].id + (!nodes[0].getParentNode() ? "" : "/") + modalPathName.val();
+            var parentNode = nodes[0].getParentNode();
+            var pathId;
+            if (nodes[0].id === "/") {
+                parentNode = nodes[0];
+                pathId = nodes[0].id + modalPathName.val()
+            } else {
+                pathId = nodes[0].id + "/" + modalPathName.val()
+            }
             $.ajax({
                 type: "POST",
                 dataType: "json",
@@ -471,9 +491,8 @@
                 data: "createMode=" + modalCreateMode.val() + "&data=" + CKEDITOR.instances.modal_input_data.getData() + "&pathId=" + pathId,
                 success: function (data) {
                     if (10000 === data.code) {
-                        var node = nodes[0].isParent ? nodes[0] : nodes[0].getParentNode();
-                        zTree.reAsyncChildNodes(node, "refresh", true);
-                        swal("添加成功", "节点" + data.data + "添加成功", "success");
+                        zTree.reAsyncChildNodes(parentNode, "refresh", true);
+                        swal("添加成功", "节点 " + data.data + " 添加成功", "success");
                     } else {
                         swal("添加节点失败", data.msg, "error");
                     }
@@ -518,7 +537,6 @@
             modalEditCreateMode.select2({"disabled": true});
         }
 
-        isCurrentEdit = true;
         $.ajax({
             type: "GET",
             dataType: "json",
@@ -550,19 +568,31 @@
             modalPathEdit.modal("hide");
             var zTree = $.fn.zTree.getZTreeObj("ztree");
             var nodes = zTree.getSelectedNodes();
+            var parentNode = nodes[0].getParentNode();
+            if (nodes[0].id === "/") {
+                parentNode = nodes[0];
+            }
             var oldPathId = nodes[0].id;
-            var newPathId = nodes[0].isParent ? nodes[0].id : nodes[0].getParentNode().id + "/" + modalEditPathName.val();
+            var newPathId;
+            if (nodes[0].isParent) {
+                newPathId = nodes[0].id;
+            } else {
+                if (parentNode.id !== "/") {
+                    newPathId = parentNode.id + "/" + modalEditPathName.val();
+                } else {
+                    newPathId = "/" + modalEditPathName.val();
+                }
+            }
             $.ajax({
                 type: "POST",
                 dataType: "json",
                 url: contextPath + "path/edit/" + alias,
                 data: "createMode=" + modalEditCreateMode.val() + "&data=" + CKEDITOR.instances.modal_input_edit_data.getData() + "&oldPathId=" + oldPathId
-                + "&newPathId=" + newPathId + "&dataVersion=" + $("#dataVersion").html(),
+                    + "&newPathId=" + newPathId + "&dataVersion=" + $("#dataVersion").html(),
                 success: function (data) {
                     if (10000 === data.code) {
-                        var node = nodes[0].getParentNode();
-                        zTree.reAsyncChildNodes(node, "refresh", true);
-                        swal("修改成功", "节点" + data.data + "修改成功", "success");
+                        zTree.reAsyncChildNodes(parentNode, "refresh", true);
+                        swal("修改成功", "节点 " + data.data + " 修改成功", "success");
                     } else {
                         swal("修改节点失败", data.msg, "error");
                     }
@@ -574,21 +604,21 @@
             });
         }
     });
-    var ws = new WebSocket("ws://" + window.location.host + contextPath + "zk/child/event");
-    ws.onopen = function (ev) {
-    };
-    ws.onmessage = function (ev) {
-        if (isCurrentEdit) {
-            isCurrentEdit = false;
-            return;
-        }
-        var path = ev.data;
-        var message = "节点" + path + "发生变化, 已经刷新";
-        toastr.info(message);
-        var zTree = $.fn.zTree.getZTreeObj("ztree");
-        zTree.reAsyncChildNodes(zTree.getNodeByTId("/"), "refresh", true);
-        cleanTable();
-    };
+    // var ws = new WebSocket("ws://" + window.location.host + contextPath + "zk/child/event");
+    // ws.onopen = function (ev) {
+    // };
+    // ws.onmessage = function (ev) {
+    //     if (isCurrentEdit) {
+    //         isCurrentEdit = false;
+    //         return;
+    //     }
+    //     var path = ev.data;
+    //     var message = "节点" + path + "发生变化, 已经刷新";
+    //     toastr.info(message);
+    //     var zTree = $.fn.zTree.getZTreeObj("ztree");
+    //     zTree.reAsyncChildNodes(zTree.getNodeByTId("/"), "refresh", true);
+    //     cleanTable();
+    // };
 </script>
 </body>
 </html>
